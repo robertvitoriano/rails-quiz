@@ -24,7 +24,7 @@ module Api
       def create
         course = Course.create(course_params)
         if course.save
-          render json: {status:'Saved Course', message:'saved the course'}, status: :ok
+          render json: {status:'Saved Course', message:'saved the course', data: course}, status: :ok
         else
           render json: {status:'Not saved', message:'couldn"t save course'}, status: :ok
         end
