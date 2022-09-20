@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_09_20_040933) do
+ActiveRecord::Schema[7.0].define(version: 2022_09_20_041435) do
   create_table "course_questions", charset: "latin1", force: :cascade do |t|
     t.string "question_text"
     t.integer "course_id"
@@ -29,8 +29,8 @@ ActiveRecord::Schema[7.0].define(version: 2022_09_20_040933) do
     t.decimal "goal", precision: 10
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "course_types_id", null: false
-    t.index ["course_types_id"], name: "index_courses_on_course_types_id"
+    t.bigint "course_type_id", null: false
+    t.index ["course_type_id"], name: "index_courses_on_course_type_id"
   end
 
   create_table "question_alternatives", charset: "latin1", force: :cascade do |t|
@@ -41,5 +41,5 @@ ActiveRecord::Schema[7.0].define(version: 2022_09_20_040933) do
     t.datetime "updated_at", null: false
   end
 
-  add_foreign_key "courses", "course_types", column: "course_types_id"
+  add_foreign_key "courses", "course_types"
 end
