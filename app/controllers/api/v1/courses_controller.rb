@@ -3,7 +3,7 @@ module Api
     class CoursesController < ApplicationController
       def index
         courses = Course.order('created_at DESC')
-        render json: {status:'SUCCESS', message:'Loaded courses', data:params}, status: :ok
+        render json: {status:'SUCCESS', message:'Loaded courses', data:courses}, status: :ok
       end
 
       def show
@@ -30,15 +30,33 @@ module Api
             })
           course.save!
           questions = []
-          for q in course_params[:questions] do
+          
+          course_params[:questions].each do |question, question_index| 
             course_question = CourseQuestion.create(
               {
-              :question_text => q[:question_text],
+              :question_text => question[:question_text],
               :course_id => course[:id]
               }
             )
             course_question.save!
-            questions.push(course_question)
+            alternatives = []
+            for alternative in course_params[:questions][0][:question_alternatives] do
+              alternatives.push(QuestionAlternative.create(
+                {
+                 :course_question_id =>course_question[:id],
+                 :alternative_text => alternative[:alternative_text],
+                 :is_right => alternative[:is_right]
+                }
+               )
+              )
+            end
+            questions.push({
+               :question_text => question[:question_text],
+               :course_id => course_question[:course_id],
+               :alternatives => alternatives
+              }
+            )
+            
           end
 
           render json: {
@@ -49,10 +67,10 @@ module Api
                          }
                       },
                      status: :ok
-          rescue  Exception => ex
+        rescue  Exception => ex
           render json: {status:'Not saved', message:ex}, status: :bad_request
-          end 
-        end
+        end 
+      end
 
       def course_params
         params.permit(
