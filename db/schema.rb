@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_09_20_020038) do
+ActiveRecord::Schema[7.0].define(version: 2022_09_20_040933) do
   create_table "course_questions", charset: "latin1", force: :cascade do |t|
     t.string "question_text"
     t.integer "course_id"
@@ -29,7 +29,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_09_20_020038) do
     t.decimal "goal", precision: 10
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "course_types_id"
+    t.bigint "course_types_id", null: false
     t.index ["course_types_id"], name: "index_courses_on_course_types_id"
   end
 
