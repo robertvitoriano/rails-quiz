@@ -22,16 +22,17 @@ module Api
       end
 
       def create
-        course = Course.create(course_params)
-        if course.save
+        begin  # "try" block7
+          course = Course.create(course_params)
+          course.save!
           render json: {status:'Saved Course', message:'saved the course', data: course}, status: :ok
-        else
-          render json: {status:'Not saved', message:'couldn"t save course'}, status: :ok
+          rescue  Exception => ex
+          render json: {status:'Not saved', message:ex}, status: :bad_request
+          end 
         end
-      end
 
       def course_params
-        params.permit(:title, :goal, :course_type_id)
+        params.permit(:title, :goal, :course_types_id)
       end
     end
   end
