@@ -26,7 +26,8 @@ module Api
           course = Course.create({
              :title => course_params[:title],
              :goal => course_params[:goal],
-             :course_type_id => course_params[:course_type_id]
+             :course_type_id => course_params[:course_type_id],
+             :user_id => current_user_id
             }
           )
           course.save!
@@ -82,7 +83,6 @@ module Api
            :title,
            :goal,
            :course_type_id,
-           :user_id,
            questions:[:question_text, question_alternatives:[:is_right, :alternative_text]]
             )
       end

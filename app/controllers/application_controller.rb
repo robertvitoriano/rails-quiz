@@ -15,8 +15,8 @@ class ApplicationController < ActionController::API
 
   def current_user_id
     begin
-      token = request.headers["Authorization"].sub("Bearer ", '')
-      decoded_array = JWT.decode(token, hmac_secret, true, { algorithm: 'HS256' })
+      token = request.headers["Authorization"].sub!('Bearer ', '')
+      decoded_array = JWT.decode(token, api_secret, true, { algorithm: 'HS256' })
       payload = decoded_array.first
     rescue #JWT::VerificationError
       return nil
