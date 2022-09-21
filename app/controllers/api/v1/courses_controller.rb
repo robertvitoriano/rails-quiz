@@ -32,16 +32,18 @@ module Api
           course.save!
           questions = []
           
-          course_params[:questions].each do |question, question_index| 
+          course_params[:questions].each_with_index do |question, index| 
             course_question = CourseQuestion.create(
               {
               :question_text => question[:question_text],
               :course_id => course[:id]
               }
             )
+
             course_question.save!
+            
             alternatives = []
-            for alternative in course_params[:questions][0][:question_alternatives] do
+            for alternative in course_params[:questions][index][:question_alternatives] do
               alternatives.push(QuestionAlternative.create(
                 {
                  :course_question_id =>course_question[:id],
@@ -51,6 +53,8 @@ module Api
                )
               )
             end
+
+            
             questions.push({
                :question_text => question[:question_text],
                :course_id => course_question[:course_id],
@@ -80,7 +84,6 @@ module Api
            :course_type_id,
            questions:[:question_text, question_alternatives:[:is_right, :alternative_text]]
             )
-
       end
     end
   end
