@@ -13,8 +13,8 @@ module Api
       end
 
       def login
-        user = User.find_by(username: params['username'])
-        isAuthed = user.try(:authenticate, params['password'])
+        user = User.find_by(username: login_user_params['username'])
+        isAuthed = user.try(:authenticate, login_user_params['password'])
 
         if !user
             render json: {

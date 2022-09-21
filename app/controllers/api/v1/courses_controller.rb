@@ -41,7 +41,7 @@ module Api
             )
 
             course_question.save!
-            
+
             alternatives = []
             for alternative in course_params[:questions][index][:question_alternatives] do
               alternatives.push(QuestionAlternative.create(
@@ -82,6 +82,7 @@ module Api
            :title,
            :goal,
            :course_type_id,
+           :user_id,
            questions:[:question_text, question_alternatives:[:is_right, :alternative_text]]
             )
       end
