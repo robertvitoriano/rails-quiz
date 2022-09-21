@@ -27,9 +27,11 @@ module Api
                 message: 'Incorrect Password'
                 }, status: :forbidden
         else
+          token = encode_token(user.id)
             render json: {
                 id: user.id,
                 username: user.username,
+                token: token
             }
         end
     end
