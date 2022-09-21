@@ -27,7 +27,8 @@ module Api
              :title => course_params[:title],
              :goal => course_params[:goal],
              :course_type_id => course_params[:course_type_id]
-            })
+            }
+          )
           course.save!
           questions = []
           
