@@ -19,12 +19,12 @@ module Api
         if !user
             render json: {
                 key: 'username',
-                message: 'No user can be found with that Username'
+                message: 'Wrong Credentials'
             }, status: :forbidden
         elsif !isAuthed
             render json: {
                 key: 'password',
-                message: 'Incorrect Password'
+                message: 'Wrong Credentials'
                 }, status: :forbidden
         else
           token = encode_token(user.id)
@@ -34,7 +34,7 @@ module Api
                 token: token
             }
         end
-    end
+      end
 
       def create_user_params
         params.permit(:name, :username, :email, :password)
@@ -42,6 +42,6 @@ module Api
       def login_user_params
         params.permit(:username,:password)
       end
-    end
- end
+  end
+  end
 end
