@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_09_22_001421) do
+ActiveRecord::Schema[7.0].define(version: 2022_09_22_012947) do
   create_table "course_questions", charset: "latin1", force: :cascade do |t|
     t.string "question_text"
     t.datetime "created_at", null: false
@@ -51,6 +51,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_09_22_001421) do
     t.bigint "user_id"
     t.bigint "question_alternative_id"
     t.index ["question_alternative_id"], name: "index_user_alternatives_on_question_alternative_id"
+    t.index ["user_id", "question_alternative_id"], name: "index_user_alternatives_on_user_id_and_question_alternative_id", unique: true
     t.index ["user_id"], name: "index_user_alternatives_on_user_id"
   end
 
