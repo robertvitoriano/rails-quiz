@@ -3,10 +3,9 @@ module Api
   class UsersController < ApplicationController
       def create 
         begin
-        user = User.create(create_user_params)
-        user.save!
+          user = User.create(create_user_params)
+          user.save!
           render json: {status:'SUCCESS', message:'created user', data:user}, status: :ok
-
         rescue  Exception => ex
           render json: {status:'Not saved', message:ex}, status: :bad_request
         end 

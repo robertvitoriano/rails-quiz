@@ -40,7 +40,6 @@ module Api
               :course_id => course[:id]
               }
             )
-
             course_question.save!
 
             alternatives = []
@@ -55,7 +54,6 @@ module Api
               )
             end
 
-            
             questions.push({
                :question_text => question[:question_text],
                :course_id => course_question[:course_id],

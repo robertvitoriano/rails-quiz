@@ -17,6 +17,8 @@ gem "bootsnap", require: false
 
 gem "mysql2"
 
+gem "byebug"
+
 gem "bcrypt", "~> 3.1.7"
 
 gem 'rack-cors'
