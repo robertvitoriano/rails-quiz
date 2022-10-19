@@ -22,18 +22,19 @@ module Api
       end
 
       def create
-        begin  
+        begin
           course = Course.create({
              :title => course_params[:title],
              :goal => course_params[:goal],
              :course_type_id => course_params[:course_type_id],
-             :user_id => current_user_id
+             :user_id => current_user_id,
+             :cover => course_params[:cover]
             }
           )
           course.save!
           questions = []
-          
-          course_params[:questions].each_with_index do |question, index| 
+
+          course_params[:questions].each_with_index do |question, index|
             course_question = CourseQuestion.create(
               {
               :question_text => question[:question_text],
@@ -60,7 +61,7 @@ module Api
                :alternatives => alternatives
               }
             )
-            
+
           end
 
           render json: {
@@ -73,7 +74,7 @@ module Api
                      status: :ok
         rescue  Exception => ex
           render json: {status:'Not saved', message:ex}, status: :bad_request
-        end 
+        end
       end
 
       def course_params
@@ -81,6 +82,7 @@ module Api
            :title,
            :goal,
            :course_type_id,
+           :cover,
            questions:[:question_text, question_alternatives:[:is_right, :alternative_text]]
             )
       end
