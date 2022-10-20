@@ -28,7 +28,7 @@ module Api
              :goal => course_params[:goal],
              :course_type_id => course_params[:course_type_id],
              :user_id => current_user_id,
-             :cover => course_params[:cover]
+             :cover => course_params[:cover] != nil ? course_params[:cover] : 'https://d3njjcbhbojbot.cloudfront.net/api/utilities/v1/imageproxy/https://coursera-course-photos.s3.amazonaws.com/cb/3c4030d65011e682d8b14e2f0915fa/shutterstock_226881610.jpg?auto=format%2Ccompress&dpr=1'
             }
           )
           course.save!
