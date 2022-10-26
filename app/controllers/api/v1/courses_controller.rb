@@ -7,16 +7,16 @@ module Api
       end
 
       def show
-        course = Course.find(params[:id])
+        course = Course.select("id, title, goal, cover, course_type_id as courseTypeId").where("id = "+ params[:id])
         questions = CourseQuestion.where("course_id = "+ params[:id])
         questions_result = []
         questions.each_with_index do |question, index|
           questions_result.push({
+            :id => question[:id],
             :title => question[:question_text],
             :course_id => params[:id],
-            :alternatives => QuestionAlternative.where("course_question_id = "+question[:id].to_s)
+            :alternatives => QuestionAlternative.select("alternative_text as text, course_question_id as questionId, is_right as isRight, id").where("course_question_id = "+question[:id].to_s)
           })
-
         end
 
         render json: {status:'SUCCESS',
