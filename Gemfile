@@ -14,13 +14,10 @@ gem "tzinfo-data", platforms: %i[ mingw mswin x64_mingw jruby ]
 
 # Reduces boot times through caching; required in config/boot.rb
 gem "bootsnap", require: false
-
 gem "mysql2"
-
 gem "byebug"
-
 gem "bcrypt", "~> 3.1.7"
-
+gem "aws-sdk"
 gem 'rack-cors'
 gem "jwt", "~> 2.2"
 gem "dotenv-rails"
