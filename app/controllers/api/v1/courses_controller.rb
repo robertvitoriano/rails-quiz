@@ -8,19 +8,19 @@ module Api
 
       def show
         course = Course.select("id, title, goal, cover, course_type_id as courseTypeId").where("id = "+ params[:id])
-        questions = CourseQuestion.where("course_id = "+ params[:id])
+        questions = CourseQuestion.select("id, question_text, course_id as courseId").where("course_id = "+ params[:id])
         questions_result = []
         questions.each_with_index do |question, index|
           questions_result.push({
             :id => question[:id],
             :title => question[:question_text],
-            :course_id => params[:id],
+            :courseId => params[:id],
             :alternatives => QuestionAlternative.select("alternative_text as text, course_question_id as questionId, is_right as isRight, id").where("course_question_id = "+question[:id].to_s)
           })
         end
 
         render json: {status:'SUCCESS',
-        message:'found the movie',
+        message:'found the course',
         data:{
           :course => course,
           :questions => questions_result
