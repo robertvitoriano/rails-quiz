@@ -10,12 +10,16 @@ module Api
         course = Course.select("id, title, goal, cover, course_type_id as courseTypeId").where("id = "+ params[:id])
         questions = CourseQuestion.select("id, question_text, course_id as courseId").where("course_id = "+ params[:id])
         questions_result = []
+        question_ids = questions.map { |question| question.id }
+        course_alternatives = QuestionAlternative.select("alternative_text as text, course_question_id as questionId, is_right as isRight, id").where(course_question_id: question_ids)
+
         questions.each_with_index do |question, index|
+          question_alternatives = course_alternatives.select {|alternative| alternative.questionId == question.id}
           questions_result.push({
             :id => question[:id],
             :title => question[:question_text],
             :courseId => params[:id],
-            :alternatives => QuestionAlternative.select("alternative_text as text, course_question_id as questionId, is_right as isRight, id").where("course_question_id = "+question[:id].to_s)
+            :alternatives => question_alternatives
           })
         end
 
