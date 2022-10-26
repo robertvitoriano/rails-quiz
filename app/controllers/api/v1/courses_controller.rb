@@ -7,8 +7,16 @@ module Api
       end
 
       def show
-        courses = Course.find(params[:id])
-        render json: {status:'SUCCESS', message:'found the movie', data:courses}, status: :ok
+        course = Course.find(params[:id])
+        questions = CourseQuestion.where("course_id = "+ params[:id])
+
+        render json: {status:'SUCCESS',
+        message:'found the movie',
+        data:{
+          :course => course,
+          :questions => questions
+        }},
+        status: :ok
       end
 
       def destroy
@@ -26,7 +34,7 @@ module Api
           course = Course.create({
              :title => course_params[:title],
              :goal => course_params[:goal],
-             :course_type_id => course_params[:course_type_id],
+             :course_type_id => course_params[:courseTypeId],
              :user_id => current_user_id,
              :cover => course_params[:cover] != nil ? course_params[:cover] : 'https://d3njjcbhbojbot.cloudfront.net/api/utilities/v1/imageproxy/https://coursera-course-photos.s3.amazonaws.com/cb/3c4030d65011e682d8b14e2f0915fa/shutterstock_226881610.jpg?auto=format%2Ccompress&dpr=1'
             }
@@ -37,19 +45,19 @@ module Api
           course_params[:questions].each_with_index do |question, index|
             course_question = CourseQuestion.create(
               {
-              :question_text => question[:question_text],
+              :question_text => question[:text],
               :course_id => course[:id]
               }
             )
             course_question.save!
 
             alternatives = []
-            for alternative in course_params[:questions][index][:question_alternatives] do
+            for alternative in course_params[:questions][index][:alternatives] do
               alternatives.push(QuestionAlternative.create(
                 {
                  :course_question_id =>course_question[:id],
-                 :alternative_text => alternative[:alternative_text],
-                 :is_right => alternative[:is_right]
+                 :alternative_text => alternative[:text],
+                 :is_right => alternative[:isRight]
                 }
                )
               )
@@ -81,9 +89,9 @@ module Api
         params.permit(
            :title,
            :goal,
-           :course_type_id,
+           :courseTypeId,
            :cover,
-           questions:[:question_text, question_alternatives:[:is_right, :alternative_text]]
+           questions:[:text, alternatives:[:isRight, :text]]
             )
       end
     end
