@@ -9,12 +9,21 @@ module Api
       def show
         course = Course.find(params[:id])
         questions = CourseQuestion.where("course_id = "+ params[:id])
+        questions_result = []
+        questions.each_with_index do |question, index|
+          questions_result.push({
+            :title => question[:question_text],
+            :course_id => params[:id],
+            :alternatives => QuestionAlternative.where("course_question_id = "+question[:id].to_s)
+          })
+
+        end
 
         render json: {status:'SUCCESS',
         message:'found the movie',
         data:{
           :course => course,
-          :questions => questions
+          :questions => questions_result
         }},
         status: :ok
       end
