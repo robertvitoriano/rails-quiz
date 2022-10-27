@@ -7,7 +7,7 @@ module Api
       end
 
       def show
-        course = Course.select("id, title, goal, cover, course_type_id as courseTypeId").where("id = "+ params[:id])
+        course = Course.select("id, title, goal, cover, course_type_id as courseTypeId").where("id = "+ params[:id]).first()
         questions = CourseQuestion.select("id, question_text, course_id as courseId").where("course_id = "+ params[:id])
         questions_result = []
         question_ids = questions.map { |question| question.id }
@@ -44,32 +44,35 @@ module Api
 
       def create
         begin
+          course_parsed = JSON.parse(course_params[:course])
+          # TODO
+          # DEAL WITH THE COVER IMAGE
           course = Course.create({
-             :title => course_params[:title],
-             :goal => course_params[:goal],
-             :course_type_id => course_params[:courseTypeId],
+             :title => course_parsed['title'],
+             :goal => course_parsed['goal'],
+             :course_type_id => course_parsed['courseTypeId'],
              :user_id => current_user_id,
-             :cover => course_params[:cover] != nil ? course_params[:cover] : 'https://d3njjcbhbojbot.cloudfront.net/api/utilities/v1/imageproxy/https://coursera-course-photos.s3.amazonaws.com/cb/3c4030d65011e682d8b14e2f0915fa/shutterstock_226881610.jpg?auto=format%2Ccompress&dpr=1'
+            #  :cover => course_params[:cover] != nil ? course_params[:cover] : 'https://d3njjcbhbojbot.cloudfront.net/api/utilities/v1/imageproxy/https://coursera-course-photos.s3.amazonaws.com/cb/3c4030d65011e682d8b14e2f0915fa/shutterstock_226881610.jpg?auto=format%2Ccompress&dpr=1'
             }
           )
           course.save!
           questions = []
-          course_params[:questions].each_with_index do |question, index|
+          course_parsed['questions'].each_with_index do |question, index|
             course_question = CourseQuestion.create(
               {
-              :question_text => question[:text],
-              :course_id => course[:id]
+              :question_text => question['text'],
+              :course_id => course['id']
               }
             )
             course_question.save!
 
             alternatives = []
-            for alternative in course_params[:questions][index][:alternatives] do
+            for alternative in course_parsed['questions'][index]['alternatives'] do
               alternatives.push(QuestionAlternative.create(
                 {
                  :course_question_id =>course_question[:id],
-                 :alternative_text => alternative[:text],
-                 :is_right => alternative[:isRight]
+                 :alternative_text => alternative['text'],
+                 :is_right => alternative['isRight']
                 }
                )
               )
@@ -98,13 +101,7 @@ module Api
       end
 
       def course_params
-        params.permit(
-           :title,
-           :goal,
-           :courseTypeId,
-           :cover,
-           questions:[:text, alternatives:[:isRight, :text]]
-            )
+        params.permit(:course, :cover)
       end
     end
   end
