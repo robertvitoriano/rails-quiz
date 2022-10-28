@@ -30,12 +30,19 @@ class ApplicationController < ActionController::API
     render json: {error: 'Unauthorized'}, status: :unauthorized if !client_has_valid_token?
   end
 
-  def get_uploaded_object(s3_client, object_key)
+
+  def write_file_to_storage(file, path)
+    FileUtils.mkdir(path) unless File.exists?(path)
+
+    File.open(File.join(path,file.original_filename),"wb") { |f| f.write(file.read)}
+  end
+
+  def upload_to_s3(s3_client, object_key)
     response = s3_client.put_object(
       bucket: ENV["S3_BUCKET"],
       key: object_key,
       acl:'public-read',
-      content_type:'image/jpg',
+      content_type:'image/png',
       content_disposition:'attachment'
     )
     if response.etag
