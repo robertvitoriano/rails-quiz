@@ -17,7 +17,7 @@ gem "bootsnap", require: false
 gem "mysql2"
 gem "byebug"
 gem "bcrypt", "~> 3.1.7"
-gem "aws-sdk"
+gem 'aws-sdk-s3', '~> 1'
 gem 'rack-cors'
 gem "jwt", "~> 2.2"
 gem "dotenv-rails"

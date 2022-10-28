@@ -2,7 +2,7 @@ module Api
   module V1
     class CoursesController < ApplicationController
       def index
-        courses = Course.order('created_at DESC')
+        courses = Course.where('user_id = '+current_user_id.to_s).order('created_at DESC')
         render json: {status:'SUCCESS', message:'Loaded courses', data:courses}, status: :ok
       end
 
@@ -47,12 +47,44 @@ module Api
           course_parsed = JSON.parse(course_params[:course])
           # TODO
           # DEAL WITH THE COVER IMAGE
+
+          # s3 = Aws::S3::Client.new
+          # resp = s3.list_buckets
+          # puts(resp.to_s)
+
+          # obj = s3.objects[params[:cover].original_filename]
+
+          # # Upload the file
+          # obj.write(
+          #   file: params[:cover],
+          #   acl: :public_read
+          # )
+
+          # # Create an object for the upload
+          # @upload = Upload.new(
+          #     url: obj.public_url,
+          #     name: obj.key
+          #   )
+
+          # # Save the upload
+          # @upload.save
+
+          # s3 = Aws::S3::Client.new
+          # resp = s3.list_buckets
+
+          # WORKING CODE
+
+          object_key = 'test.jpg'
+          s3_client = Aws::S3::Client.new(region: ENV["AWS_REGION"])
+
+          uploaded_object = get_uploaded_object(s3_client, object_key)
+
           course = Course.create({
              :title => course_parsed['title'],
              :goal => course_parsed['goal'],
              :course_type_id => course_parsed['courseTypeId'],
              :user_id => current_user_id,
-            #  :cover => course_params[:cover] != nil ? course_params[:cover] : 'https://d3njjcbhbojbot.cloudfront.net/api/utilities/v1/imageproxy/https://coursera-course-photos.s3.amazonaws.com/cb/3c4030d65011e682d8b14e2f0915fa/shutterstock_226881610.jpg?auto=format%2Ccompress&dpr=1'
+             :cover => "https://#{ENV["S3_BUCKET"]}.s3.amazonaws.com/#{object_key}"
             }
           )
           course.save!

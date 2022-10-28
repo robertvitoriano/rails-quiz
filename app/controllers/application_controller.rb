@@ -1,3 +1,5 @@
+require 'aws-sdk-s3'
+
 class ApplicationController < ActionController::API
   private
   def encode_token(user_id)
@@ -27,4 +29,23 @@ class ApplicationController < ActionController::API
   def require_login
     render json: {error: 'Unauthorized'}, status: :unauthorized if !client_has_valid_token?
   end
+
+  def get_uploaded_object(s3_client, object_key)
+    response = s3_client.put_object(
+      bucket: ENV["S3_BUCKET"],
+      key: object_key,
+      acl:'public-read',
+      content_type:'image/jpg',
+      content_disposition:'attachment'
+    )
+    if response.etag
+      return response
+    else
+      return false
+    end
+  rescue StandardError => e
+    puts "Error uploading object: #{e.message}"
+    return false
+  end
+
 end
