@@ -46,7 +46,7 @@ class ApplicationController < ActionController::API
         bucket: ENV["S3_BUCKET"],
         key: object_key,
         acl:'public-read',
-        content_type:'image/png',
+        content_type:'image/jpeg',
         content_disposition:'attachment',
         body: file
       )

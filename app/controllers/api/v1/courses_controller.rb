@@ -1,3 +1,5 @@
+require 'uri'
+
 module Api
   module V1
     class CoursesController < ApplicationController
@@ -45,38 +47,11 @@ module Api
       def create
         begin
           course_parsed = JSON.parse(course_params[:course])
-          # TODO
-          # DEAL WITH THE COVER IMAGE
-
-          # s3 = Aws::S3::Client.new
-          # resp = s3.list_buckets
-          # puts(resp.to_s)
-
-          # obj = s3.objects[params[:cover].original_filename]
-
-          # # Upload the file
-          # obj.write(
-          #   file: params[:cover],
-          #   acl: :public_read
-          # )
-
-          # # Create an object for the upload
-          # @upload = Upload.new(
-          #     url: obj.public_url,
-          #     name: obj.key
-          #   )
-
-          # # Save the upload
-          # @upload.save
-
-          # s3 = Aws::S3::Client.new
-          # resp = s3.list_buckets
-
-          # WORKING CODE
-
           object_key = course_params[:cover].original_filename
           s3_client = Aws::S3::Client.new(region: ENV["AWS_REGION"])
           upload_to_s3(s3_client, object_key, course_params[:cover])
+          uri_encoder = URI::Parser.new
+          encoded_uri = uri_encoder.escape("https://#{ENV["S3_BUCKET"]}.s3.amazonaws.com/#{object_key}")
 
 
           course = Course.create({
@@ -84,7 +59,7 @@ module Api
              :goal => course_parsed['goal'],
              :course_type_id => course_parsed['courseTypeId'],
              :user_id => current_user_id,
-             :cover => "https://#{ENV["S3_BUCKET"]}.s3.amazonaws.com/#{object_key}"
+             :cover => encoded_uri
             }
           )
           course.save!
