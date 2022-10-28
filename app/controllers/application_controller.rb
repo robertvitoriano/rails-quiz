@@ -37,13 +37,14 @@ class ApplicationController < ActionController::API
     File.open(File.join(path,file.original_filename),"wb") { |f| f.write(file.read)}
   end
 
-  def upload_to_s3(s3_client, object_key)
+  def upload_to_s3(s3_client, object_key, file)
     response = s3_client.put_object(
       bucket: ENV["S3_BUCKET"],
       key: object_key,
       acl:'public-read',
       content_type:'image/png',
-      content_disposition:'attachment'
+      content_disposition:'attachment',
+      body: file
     )
     if response.etag
       return response

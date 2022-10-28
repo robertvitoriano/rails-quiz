@@ -78,10 +78,11 @@ module Api
 
           write_file_to_storage(course_params[:cover], @tmp_path)
 
-          object_key = 'test.jpg'
+          object_key = course_params[:cover].original_filename
           s3_client = Aws::S3::Client.new(region: ENV["AWS_REGION"])
+          encoded_image = Base64.encode64(File.open("#{Rails.root}/tmp/storage/course_covers/"+course_params[:cover].original_filename, "rb").read)
 
-          uploaded_object = upload_to_s3(s3_client, object_key)
+         upload_to_s3(s3_client, object_key, encoded_image)
 
           course = Course.create({
              :title => course_parsed['title'],
@@ -116,7 +117,7 @@ module Api
 
             questions.push({
                :question_text => course_question[:question_text],
-               :course_id => course_question[:course_id],
+                  :course_id => course_question[:course_id],
                :alternatives => alternatives
               }
             )
