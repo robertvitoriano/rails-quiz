@@ -74,15 +74,10 @@ module Api
 
           # WORKING CODE
 
-          @tmp_path = "#{Rails.root}/tmp/storage/course_covers"
-
-          write_file_to_storage(course_params[:cover], @tmp_path)
-
           object_key = course_params[:cover].original_filename
           s3_client = Aws::S3::Client.new(region: ENV["AWS_REGION"])
-          File.open("#{Rails.root}/tmp/storage/course_covers/"+course_params[:cover].original_filename, 'rb') do |file|
-            upload_to_s3(s3_client, object_key, file)
-          end
+          upload_to_s3(s3_client, object_key, course_params[:cover])
+
 
           course = Course.create({
              :title => course_parsed['title'],
