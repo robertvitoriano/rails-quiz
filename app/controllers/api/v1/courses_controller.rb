@@ -80,9 +80,9 @@ module Api
 
           object_key = course_params[:cover].original_filename
           s3_client = Aws::S3::Client.new(region: ENV["AWS_REGION"])
-          encoded_image = Base64.encode64(File.open("#{Rails.root}/tmp/storage/course_covers/"+course_params[:cover].original_filename, "rb").read)
-
-         upload_to_s3(s3_client, object_key, encoded_image)
+          File.open("#{Rails.root}/tmp/storage/course_covers/"+course_params[:cover].original_filename, 'rb') do |file|
+            upload_to_s3(s3_client, object_key, file)
+          end
 
           course = Course.create({
              :title => course_parsed['title'],
