@@ -53,7 +53,6 @@ module Api
           uri_encoder = URI::Parser.new
           encoded_uri = uri_encoder.escape("https://#{ENV["S3_BUCKET"]}.s3.amazonaws.com/#{object_key}")
 
-
           course = Course.create({
              :title => course_parsed['title'],
              :goal => course_parsed['goal'],
