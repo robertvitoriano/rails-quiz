@@ -1,6 +1,7 @@
 require 'aws-sdk-s3'
 
 class ApplicationController < ActionController::API
+  before_action :authenticate_user_request
 
   attr_reader :current_user
 

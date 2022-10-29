@@ -3,7 +3,6 @@ require 'uri'
 module Api
   module V1
     class CoursesController < ApplicationController
-      before_action :authenticate_admin_request
 
       def index
         courses = Course.where('user_id = '+current_user_id.to_s).order('created_at DESC')
@@ -48,7 +47,6 @@ module Api
 
       def create
         begin
-          authenticate_admin_request
 
           encoded_uri = nil
           course_parsed = JSON.parse(course_params[:course])
