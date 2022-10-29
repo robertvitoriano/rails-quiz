@@ -4,37 +4,47 @@ class ApplicationController < ActionController::API
 
   attr_reader :current_user
 
-  def authenticate_request
-    @current_user = AuthorizeApiRequest.call(request.headers).result
-    render json: { error: 'Not Authorized' }, status: 401 unless @current_user
-  end
-
   def authenticate_user_request
-    @current_user = AuthorizeApiRequest.call("user", decoded_auth_token[:user_id]).result
-    render json: { error: 'Not Authorized' }, status: 401 unless @current_user
+    begin
+      if decoded_auth_token == nil
+        return render json: { error: "Invalid token" }, status: 401 unless @current_user
+      end
+      @current_user = AuthorizeApiRequest.call("user", decoded_auth_token[:user_id]).result
+    rescue StandardError => error
+     render json: { error: error }, status: 401 unless @current_user
+    end
   end
 
   def authenticate_admin_request
-   if(decoded_auth_token[:level] == "admin")
-    @current_user = AuthorizeApiRequest.call("admin", decoded_auth_token[:user_id] ).result
-    render json: { error: 'Not Authorized' }, status: 401 unless @current_user
-   else
-    render json: { error: 'Not Authorized' }, status: 401 unless @current_user
-   end
+    begin
+      if decoded_auth_token == nil
+        return render json: { error: "Invalid token" }, status: 401 unless @current_user
+      end
+      if(decoded_auth_token[:level] == "admin")
+      @current_user = AuthorizeApiRequest.call("admin", decoded_auth_token[:user_id] ).result
+       render json: { error: 'Not Authorized' }, status: 401 unless @current_user
+      else
+       render json: { error: 'Not Authorized' }, status: 401 unless @current_user
+      end
+    rescue StandardError => error
+      render json: { error: error }, status: 401 unless @current_user
+    end
   end
 
   def decoded_auth_token
-    @decoded_auth_token ||= JsonWebToken.decode(http_auth_header)
-    @decoded_auth_token || errors.add(:token, 'Invalid token') && nil
+    @decoded_auth_token = JsonWebToken.decode(http_auth_token)
+    if(@decoded_auth_token == nil)
+       StandardError.new "Invalid Token"
+    end
+    return @decoded_auth_token
   end
 
-  def http_auth_header
+  def http_auth_token
     if request.headers['Authorization'].present?
       return request.headers['Authorization'].split(' ').last
     else
-      errors.add(:token, 'Missing token')
+      StandardError.new "Missing Token"
     end
-    nil
   end
 
 
