@@ -10,7 +10,7 @@ Rails.application.routes.draw do
 
         end
       end
-      resources :question_alternatives do
+      resources :alternatives do
         collection do
           post 'save-user-answer', to: 'question_alternatives#save_user_answer'
         end
