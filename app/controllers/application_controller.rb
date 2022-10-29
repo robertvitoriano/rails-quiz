@@ -1,12 +1,8 @@
 require 'aws-sdk-s3'
 
 class ApplicationController < ActionController::API
-  before_action :authenticate_user_request
-  before_action :authenticate_admin_request
 
   attr_reader :current_user
-
-  private
 
   def authenticate_admin_request
     @current_user = AuthorizeApiRequest.call(request.headers, "admin").result

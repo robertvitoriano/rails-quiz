@@ -3,7 +3,7 @@ require 'uri'
 module Api
   module V1
     class CoursesController < ApplicationController
-      skip_before_action :authenticate_user_request
+      before_action :authenticate_admin_request
 
       def index
         courses = Course.where('user_id = '+current_user_id.to_s).order('created_at DESC')
