@@ -12,7 +12,14 @@ module Api
             level:"user"
             })
           user.save!
-          render json: {status:'SUCCESS', message:'created user', data:user}, status: :ok
+          render json: {
+            status:'SUCCESS',
+            message:'created user',
+            data:{
+              name: user[:name],
+              email: user[:email],
+              username: user[:username]
+          }}, status: :ok
         rescue  Exception => ex
           render json: {status:'Not saved', message:ex}, status: :bad_request
         end
