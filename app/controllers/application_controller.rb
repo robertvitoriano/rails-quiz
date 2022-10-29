@@ -43,7 +43,6 @@ class ApplicationController < ActionController::API
     splitted_file_name = course_params[:cover].original_filename.split('.', 2)
     file_format = splitted_file_name[1]
     File.open(@tmp_path+'/'+course_params[:cover].original_filename, 'rb') do |file|
-      upload_to_s3(s3_client, object_key, file)
       s3_client.put_object(
         bucket: ENV["S3_BUCKET"],
         key: object_key,
