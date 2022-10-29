@@ -15,7 +15,8 @@ class AuthenticateUser
   attr_accessor :username, :password
 
   def user
-    user = User.where({username: username}).find(1)
+    user = User.where({username: username})[0]
+    puts (" MY USER #{user.to_s}")
     return user if user && user.authenticate(password)
     errors.add :user_authentication, 'invalid credentials'
     nil

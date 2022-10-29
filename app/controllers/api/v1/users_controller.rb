@@ -1,7 +1,8 @@
 module Api
   module V1
     class UsersController < ApplicationController
-      skip_before_action :authenticate_request
+      skip_before_action :authenticate_user_request
+      skip_before_action :authenticate_admin_request
 
       def create
         begin

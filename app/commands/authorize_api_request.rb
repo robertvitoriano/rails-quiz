@@ -1,8 +1,9 @@
 class AuthorizeApiRequest
   prepend SimpleCommand
 
-  def initialize(headers = {})
+  def initialize(headers = {}, level = "user")
     @headers = headers
+    @level = level
   end
 
   def call
@@ -12,9 +13,11 @@ class AuthorizeApiRequest
   private
 
   attr_reader :headers
+  attr_reader :level
+
 
   def user
-    @user ||= User.find(decoded_auth_token[:user_id]) if decoded_auth_token
+    @user ||= User.where({id: decoded_auth_token[:user_id], level:level})[0] if decoded_auth_token
     @user || errors.add(:token, 'Invalid token') && nil
   end
 
