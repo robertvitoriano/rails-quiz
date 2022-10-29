@@ -3,6 +3,9 @@ require 'uri'
 module Api
   module V1
     class CoursesController < ApplicationController
+      before_action :authenticate_admin_request, only: [:create, :update, :destroy]
+      before_action :authenticate_user_request, only: [:index, :show]
+
 
       def index
         courses = Course.where('user_id = '+current_user_id.to_s).order('created_at DESC')

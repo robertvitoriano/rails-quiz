@@ -1,8 +1,7 @@
 module Api
   module V1
     class UsersController < ApplicationController
-      skip_before_action :authenticate_user_request
-
+      before_action :authenticate_admin_request, only: [:create]
       def create
         begin
           user = User.create(create_user_params)
@@ -24,7 +23,7 @@ module Api
       end
 
       def create_user_params
-        params.permit(:name, :username, :email, :password)
+        params.permit(:name, :username, :email, :password, :level)
       end
       def login_user_params
         params.permit(:username,:password)

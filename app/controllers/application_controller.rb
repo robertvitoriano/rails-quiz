@@ -1,22 +1,45 @@
 require 'aws-sdk-s3'
 
 class ApplicationController < ActionController::API
-  before_action :authenticate_user_request
 
   attr_reader :current_user
 
-  def authenticate_admin_request
-    @current_user = AuthorizeApiRequest.call(request.headers, "admin").result
-    render json: { error: 'You are not an administrator' }, status: 401 unless @current_user
-  end
-
-  def authenticate_user_request
-    @current_user = AuthorizeApiRequest.call(request.headers, "user").result
+  def authenticate_request
+    @current_user = AuthorizeApiRequest.call(request.headers).result
     render json: { error: 'Not Authorized' }, status: 401 unless @current_user
   end
 
+  def authenticate_user_request
+    @current_user = AuthorizeApiRequest.call("user", decoded_auth_token[:user_id]).result
+    render json: { error: 'Not Authorized' }, status: 401 unless @current_user
+  end
+
+  def authenticate_admin_request
+   if(decoded_auth_token[:level] == "admin")
+    @current_user = AuthorizeApiRequest.call("admin", decoded_auth_token[:user_id] ).result
+    render json: { error: 'Not Authorized' }, status: 401 unless @current_user
+   else
+    render json: { error: 'Not Authorized' }, status: 401 unless @current_user
+   end
+  end
+
+  def decoded_auth_token
+    @decoded_auth_token ||= JsonWebToken.decode(http_auth_header)
+    @decoded_auth_token || errors.add(:token, 'Invalid token') && nil
+  end
+
+  def http_auth_header
+    if request.headers['Authorization'].present?
+      return request.headers['Authorization'].split(' ').last
+    else
+      errors.add(:token, 'Missing token')
+    end
+    nil
+  end
+
+
   def current_user_id
-    @current_user.id
+    @current_user[:id]
   end
 
   def write_file_to_storage(file, path)
