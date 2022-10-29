@@ -1,37 +1,25 @@
 module Api
   module V1
-  class UsersController < ApplicationController
-      def create 
+    class UsersController < ApplicationController
+      skip_before_action :authenticate_request
+
+      def create
         begin
           user = User.create(create_user_params)
           user.save!
           render json: {status:'SUCCESS', message:'created user', data:user}, status: :ok
         rescue  Exception => ex
           render json: {status:'Not saved', message:ex}, status: :bad_request
-        end 
+        end
       end
 
       def login
-        user = User.find_by(username: login_user_params['username'])
-        isAuthed = user.try(:authenticate, login_user_params['password'])
+        command = AuthenticateUser.call(login_user_params[:username], login_user_params[:password])
 
-        if !user
-            render json: {
-                key: 'username',
-                message: 'Wrong Credentials'
-            }, status: :forbidden
-        elsif !isAuthed
-            render json: {
-                key: 'password',
-                message: 'Wrong Credentials'
-                }, status: :forbidden
+        if command.success?
+          render json: { token: command.result }
         else
-          token = encode_token(user.id)
-            render json: {
-                id: user.id,
-                username: user.username,
-                token: token
-            }
+          render json: { error: command.errors }, status: :unauthorized
         end
       end
 

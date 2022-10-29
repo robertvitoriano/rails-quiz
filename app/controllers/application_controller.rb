@@ -1,35 +1,20 @@
 require 'aws-sdk-s3'
 
 class ApplicationController < ActionController::API
+
+  before_action :authenticate_request
+  attr_reader :current_user
+
   private
-  def encode_token(user_id)
-    payload = { user_id: user_id }
-    JWT.encode(payload, api_secret, 'HS256')
-  end
 
-  def api_secret
-    ENV["API_SECRET_KEY"]
-  end
-
-  def client_has_valid_token?
-    !!current_user_id
+  def authenticate_request
+    @current_user = AuthorizeApiRequest.call(request.headers).result
+    render json: { error: 'Not Authorized' }, status: 401 unless @current_user
   end
 
   def current_user_id
-    begin
-      token = request.headers["Authorization"].sub!('Bearer ', '')
-      decoded_array = JWT.decode(token, api_secret, true, { algorithm: 'HS256' })
-      payload = decoded_array.first
-    rescue #JWT::VerificationError
-      return nil
-    end
-    payload["user_id"]
+    @current_user.id
   end
-
-  def require_login
-    render json: {error: 'Unauthorized'}, status: :unauthorized if !client_has_valid_token?
-  end
-
 
   def write_file_to_storage(file, path)
     FileUtils.mkdir(path) unless File.exists?(path)
