@@ -48,12 +48,13 @@ module Api
         begin
           encoded_uri = nil
           course_parsed = JSON.parse(course_params[:course])
-          if JSON.parse(course_params[:cover]) != nil
-            object_key = course_params[:cover].original_filename
-            s3_client = Aws::S3::Client.new(region: ENV["AWS_REGION"])
-            upload_to_s3(s3_client, object_key, course_params[:cover])
-            uri_encoder = URI::Parser.new
-            encoded_uri = uri_encoder.escape("https://#{ENV["S3_BUCKET"]}.s3.amazonaws.com/#{object_key}")
+
+          if  course_params[:cover] != "null" and course_params[:cover] != nil
+              object_key = course_params[:cover].original_filename
+              s3_client = Aws::S3::Client.new(region: ENV["AWS_REGION"])
+              upload_to_s3(s3_client, object_key, course_params[:cover])
+              uri_encoder = URI::Parser.new
+              encoded_uri = uri_encoder.escape("https://#{ENV["S3_BUCKET"]}.s3.amazonaws.com/#{object_key}")
           end
 
           course = Course.create({
