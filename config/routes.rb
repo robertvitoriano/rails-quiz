@@ -5,6 +5,9 @@ Rails.application.routes.draw do
       resources :users do
         collection do
           post :login
+          post 'create-user', to: 'users#create_user'
+          post 'create-admin', to: 'users#create_admin'
+
         end
       end
       resources :question_alternatives do
