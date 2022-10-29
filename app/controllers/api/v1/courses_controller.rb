@@ -48,7 +48,7 @@ module Api
         begin
           encoded_uri = nil
           course_parsed = JSON.parse(course_params[:course])
-          if course_params[:cover] != nil
+          if JSON.parse(course_params[:cover]) != nil
             object_key = course_params[:cover].original_filename
             s3_client = Aws::S3::Client.new(region: ENV["AWS_REGION"])
             upload_to_s3(s3_client, object_key, course_params[:cover])
