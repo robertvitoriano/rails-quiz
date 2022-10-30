@@ -1,0 +1,2 @@
+class Batle < ApplicationRecord
+end

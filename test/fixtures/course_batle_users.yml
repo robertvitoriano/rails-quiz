@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user_id: 1
+  result: MyString
+  performance: 9.99
+  time_spent: 1
+
+two:
+  user_id: 1
+  result: MyString
+  performance: 9.99
+  time_spent: 1

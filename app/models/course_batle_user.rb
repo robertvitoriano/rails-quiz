@@ -1,0 +1,2 @@
+class CourseBatleUser < ApplicationRecord
+end

@@ -1,0 +1,2 @@
+class CourseBatle < ApplicationRecord
+end
