@@ -30,7 +30,10 @@ module Api
 
           total = Course.count('id')
 
-        render json: {status:'SUCCESS', message:'Loaded courses', data:{
+        render json: {
+          status:'SUCCESS',
+          message:'Loaded courses',
+          data:{
           courses:courses,
           total:total
           }
@@ -48,12 +51,12 @@ module Api
         questions_result = []
         question_ids = questions.map { |question| question.id }
         course_alternatives = QuestionAlternative.select("alternative_text as text, course_question_id as questionId, is_right as isRight, id").where(course_question_id: question_ids)
-
+        course_type = CourseType.select("id, title").where("id = "+course.courseTypeId.to_s)
         questions.each_with_index do |question, index|
           question_alternatives = course_alternatives.select {|alternative| alternative.questionId == question.id}
           questions_result.push({
             :id => question[:id],
-            :title => question[:question_text],
+            :text => question[:question_text],
             :courseId => params[:id],
             :alternatives => question_alternatives
           })
@@ -63,7 +66,8 @@ module Api
         message:'found the course',
         data:{
           :course => course,
-          :questions => questions_result
+          :questions => questions_result,
+          :courseType => course_type
         }},
         status: :ok
       end
