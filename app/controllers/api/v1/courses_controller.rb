@@ -6,8 +6,11 @@ module Api
       before_action :authenticate_admin_request, only: [:create, :update, :destroy, ]
       before_action :authenticate_user_request, only: [:show_player_courses, :show, :index]
 
-
       def index
+        limit = params['limit'].to_i
+        offset = (params['page'].to_i - 1) * params['limit'].to_i
+        order = params['order'].to_s
+
         courses = Course.select("
           courses.id,
           courses.title,
@@ -21,7 +24,11 @@ module Api
           .joins(:course_type)
           .joins(:course_question)
           .group(:id)
-          .order('courses.created_at DESC')
+          .limit(limit)
+          .offset(offset)
+          .order('courses.created_at '+order)
+
+          courses_count = Course.count('id')
 
         render json: {status:'SUCCESS', message:'Loaded courses', data:courses}, status: :ok
       end
