@@ -28,9 +28,13 @@ module Api
           .offset(offset)
           .order('courses.created_at '+order)
 
-          courses_count = Course.count('id')
+          total = Course.count('id')
 
-        render json: {status:'SUCCESS', message:'Loaded courses', data:courses}, status: :ok
+        render json: {status:'SUCCESS', message:'Loaded courses', data:{
+          courses:courses,
+          total:total
+          }
+        }, status: :ok
       end
 
       def show_player_courses
