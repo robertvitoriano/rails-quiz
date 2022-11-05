@@ -3,12 +3,31 @@ require 'uri'
 module Api
   module V1
     class CoursesController < ApplicationController
-      before_action :authenticate_admin_request, only: [:create, :update, :destroy]
-      before_action :authenticate_user_request, only: [:index, :show]
+      before_action :authenticate_admin_request, only: [:create, :update, :destroy, ]
+      before_action :authenticate_user_request, only: [:show_player_courses, :show, :index]
 
 
       def index
-        courses = Course.where('user_id = '+current_user_id.to_s).order('created_at DESC')
+        courses = Course.select("
+          courses.id,
+          courses.title,
+          COUNT(course_questions.id) as questions,
+          courses.created_at as createdAt,
+          users.username as createdBy,
+          course_types.title as
+          coursesType
+          ")
+          .joins(:user)
+          .joins(:course_type)
+          .joins(:course_question)
+          .group(:id)
+          .order('courses.created_at DESC')
+
+        render json: {status:'SUCCESS', message:'Loaded courses', data:courses}, status: :ok
+      end
+
+      def show_player_courses
+        courses = Course.select('title, user_id, created_at, updated_at, course_type_id').order('created_at DESC')
         render json: {status:'SUCCESS', message:'Loaded courses', data:courses}, status: :ok
       end
 
