@@ -79,8 +79,73 @@ module Api
       end
 
       def  update
-        Course.delete(params[:id])
-        render json: {status:'SUCCESS', message:'found and deleted the course'}, status: :ok
+        encoded_uri = nil
+        course_parsed = JSON.parse(course_params[:course])
+        begin
+
+          if  course_params[:cover] != "null" and course_params[:cover] != nil
+                object_key = course_params[:cover].original_filename
+                s3_client = Aws::S3::Client.new(region: ENV["AWS_REGION"])
+                upload_to_s3(s3_client, object_key, course_params[:cover])
+                uri_encoder = URI::Parser.new
+                encoded_uri = uri_encoder.escape("https://#{ENV["S3_BUCKET"]}.s3.amazonaws.com/#{object_key}")
+          end
+          # puts(course_parsed['questions'].to_s)
+
+          course = Course.update(
+            course_parsed['id'].to_i,
+            {
+             :title => course_parsed['title'],
+             :goal => course_parsed['goal'],
+             :course_type_id => course_parsed["courseTypeId"],
+             :user_id => current_user_id,
+             :cover => encoded_uri == nil ? course_parsed['oldCover'] : encoded_uri,
+             :updated_at => Time.zone.now
+            }
+          )
+          course.save!
+          questions = []
+          course_parsed['questions'].each_with_index do |question, index|
+            course_question = CourseQuestion.update(
+              question['id'].to_i,
+              {
+              :question_text => question['text'],
+              }
+            )
+            course_question.save!
+
+            alternatives = []
+            for alternative in course_parsed['questions'][index]['alternatives'] do
+              alternatives.push(QuestionAlternative.update(
+                alternative['id'].to_i,
+                {
+                 :alternative_text => alternative['text'],
+                 :is_right => alternative['isRight']
+                }
+              )
+              )
+            end
+
+            questions.push({
+               :question_text => course_question[:question_text],
+               :course_id => course_question[:course_id],
+               :alternatives => alternatives
+              }
+            )
+
+          end
+
+          render json: {
+                        status:'Saved Course',
+                        message:'saved the course',
+                        data:{:course => course,
+                              :questions => questions
+                         }
+                      },
+                     status: :ok
+        rescue  Exception => ex
+          render json: {status:'Not saved', message:ex}, status: :bad_request
+        end
       end
 
       def create
