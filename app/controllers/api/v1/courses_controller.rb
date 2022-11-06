@@ -16,6 +16,7 @@ module Api
           courses.title,
           COUNT(course_questions.id) as questions,
           courses.created_at as createdAt,
+          courses.updated_at as updatedAt,
           users.username as createdBy,
           course_types.title as
           coursesType,
