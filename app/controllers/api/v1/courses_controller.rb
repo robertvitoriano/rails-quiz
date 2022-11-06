@@ -104,42 +104,39 @@ module Api
             }
           )
           course.save!
-          questions = []
-          course_parsed['questions'].each_with_index do |question, index|
-            course_question = CourseQuestion.update(
-              question['id'].to_i,
-              {
-              :question_text => question['text'],
-              }
-            )
-            course_question.save!
 
+
+          questions = []
+
+          course_parsed['questions'].each_with_index do |question, index|
+            questions.push({
+              :question_text => question["text"],
+              :id => question["id"],
+              :course_id => course_parsed['id'].to_i
+            })
             alternatives = []
             for alternative in course_parsed['questions'][index]['alternatives'] do
-              alternatives.push(QuestionAlternative.update(
-                alternative['id'].to_i,
-                {
-                 :alternative_text => alternative['text'],
-                 :is_right => alternative['isRight']
-                }
-              )
-              )
+              alternatives.push({
+                :id => alternative["id"],
+                :alternative_text => alternative["text"],
+                :course_question_id => question["id"]
+              })
             end
-
-            questions.push({
-               :question_text => course_question[:question_text],
-               :course_id => course_question[:course_id],
-               :alternatives => alternatives
-              }
+            QuestionAlternative.upsert_all(
+              alternatives,
+              update_only: [:alternative_text, :is_right],
             )
-
           end
+
+          CourseQuestion.upsert_all(
+            questions,
+            update_only: [:question_text]
+          )
 
           render json: {
                         status:'Saved Course',
                         message:'saved the course',
                         data:{:course => course,
-                              :questions => questions
                          }
                       },
                      status: :ok
