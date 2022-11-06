@@ -18,9 +18,7 @@ module Api
           courses.created_at as createdAt,
           courses.updated_at as updatedAt,
           users.username as createdBy,
-          course_types.title as
-          coursesType,
-          cover
+          course_types.title as coursesType
           ")
           .joins(:user)
           .joins(:course_type)
