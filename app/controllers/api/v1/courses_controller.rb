@@ -90,7 +90,6 @@ module Api
                 uri_encoder = URI::Parser.new
                 encoded_uri = uri_encoder.escape("https://#{ENV["S3_BUCKET"]}.s3.amazonaws.com/#{object_key}")
           end
-          # puts(course_parsed['questions'].to_s)
 
           course = Course.update(
             course_parsed['id'].to_i,
