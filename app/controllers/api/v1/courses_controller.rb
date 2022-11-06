@@ -7,9 +7,9 @@ module Api
       before_action :authenticate_user_request, only: [:show_player_courses, :show, :index]
 
       def index
-        limit = params['limit'].to_i
-        offset = (params['page'].to_i - 1) * params['limit'].to_i
-        order = params['order'].to_s
+        limit = params['limit'] != nil ? params['limit'].to_i : 400
+        offset = params['page'] != nil ? (params['page'].to_i - 1) * params['limit'].to_i : 0
+        order = params['order'] != nil ? params['order'].to_s : 'DESC'
 
         courses = Course.select("
           courses.id,
@@ -18,7 +18,8 @@ module Api
           courses.created_at as createdAt,
           users.username as createdBy,
           course_types.title as
-          coursesType
+          coursesType,
+          cover
           ")
           .joins(:user)
           .joins(:course_type)
@@ -26,7 +27,7 @@ module Api
           .group(:id)
           .limit(limit)
           .offset(offset)
-          .order('courses.created_at '+order)
+          .order('courses.created_at '+ order)
 
           total = Course.count('id')
 
