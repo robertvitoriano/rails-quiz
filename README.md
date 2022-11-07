@@ -4,4 +4,8 @@ A course is created by an Admin, who can edit it or delete it too. The admin can
 
 In the users home page there will be information about accumulated score, battles total, battles won and battles lost.
 
-When creating a battle, a user can define how much the battle will last and the battle assertiviness, the one who achieve the assertiviness wins, if no one does there will be an withdraw. If the time is over, the user who hit the assertivennes wins
+When creating a battle, a user can define how much the battle will last and the battle assertiviness, the one who achieve the assertiviness wins, if no one does there will be an withdraw. If the time is over, the user who hit the assertivennes wins.
+
+When the battle is created, there will be genereated a link for the user to send to the other user / there will be a real time notification for the challenged user to accept or decline the challenge.
+
+users will also be able to chat with each other during a battle,
