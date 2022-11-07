@@ -1,4 +1,4 @@
-This project purpose is to be a multplayer online game where the player can chanllenge other player to compete in a particular course, called  "battles". Questions give score and  battles have time limit. battle will be only PVP (1 player vs 1 player) at first.
+This project's purpose is to be a multiplayer online game where the player can chanllenge other player to compete in a particular course, called  "battles". Questions give score and  battles have time limit. battle will be only PVP (1 player vs 1 player) at first.
 
 A course is created by an Admin, who can edit it or delete it too. The admin can delete or create users as well as other admins.
 
