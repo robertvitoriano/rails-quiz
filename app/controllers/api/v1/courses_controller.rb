@@ -3,8 +3,8 @@ require 'uri'
 module Api
 	module V1
 		class CoursesController < ApplicationController
-			before_action :authenticate_admin_request, only: [:create, :update, :destroy, ]
-			before_action :authenticate_user_request, only: [:show_player_courses, :show, :index]
+			before_action :authenticate_admin_request, only: [:create, :update, :destroy, :index ]
+			before_action :authenticate_user_request, only: [:get_battle_courses, :show, ]
 
 			def index
 				limit = params['limit'] != nil ? params['limit'].to_i : 400
@@ -40,9 +40,32 @@ module Api
 				}, status: :ok
 			end
 
-			def show_player_courses
-				courses = Course.select('title, user_id, created_at, updated_at, course_type_id').order('created_at DESC')
-				render json: {status:'SUCCESS', message:'Loaded courses', data:courses}, status: :ok
+			def get_battle_courses
+				limit = params['limit'] != nil ? params['limit'].to_i : 100
+				offset = params['page'] != nil ? (params['page'].to_i - 1) * params['limit'].to_i : 0
+				order = params['order'] != nil ? params['order'].to_s : 'DESC'
+
+				courses = Course.select("
+          courses.id,
+          courses.title,
+          courses.created_at as createdAt,
+          courses.updated_at as updatedAt,
+          course_types.title as coursesType,
+					cover
+          ")
+          .joins(:user)
+          .joins(:course_type)
+          .limit(limit)
+          .offset(offset)
+          .order('courses.created_at '+ order)
+
+				render json: {
+					status:'SUCCESS',
+					message:'Loaded courses',
+					data:{
+						courses:courses,
+					}
+				}, status: :ok
 			end
 
 			def show
