@@ -18,7 +18,7 @@ module Api
           courses.created_at as createdAt,
           courses.updated_at as updatedAt,
           users.username as createdBy,
-          course_types.title as coursesType
+          course_types.title as courseType
           ")
           .joins(:user)
           .joins(:course_type)
@@ -50,7 +50,7 @@ module Api
           courses.title,
           courses.created_at as createdAt,
           courses.updated_at as updatedAt,
-          course_types.title as coursesType,
+          course_types.title as courseType,
 					cover
           ")
           .joins(:user)
@@ -103,6 +103,15 @@ module Api
 				def  update
 					encoded_uri = nil
 					course_parsed = JSON.parse(course_params[:course])
+					deleted_question_ids = course_params[:deletedQuestionIds] != nil ? JSON.parse(course_params[:deletedQuestionIds]) : []
+					deleted_alternative_ids = course_params[:deletedAlternativeIds] != nil ? JSON.parse(course_params[:deletedAlternativeIds]) : []
+
+					for deleted_question_id in	deleted_question_ids do
+						CourseQuestion.delete(deleted_question_id)
+					end
+					for deleted_alternative_id in	deleted_alternative_ids do
+						QuestionAlternative.delete(deleted_alternative_id)
+					end
 					begin
 
 						if  course_params[:cover] != "null" and course_params[:cover] != nil
@@ -240,7 +249,7 @@ module Api
 	end
 
 	def course_params
-		params.permit(:course, :cover)
+		params.permit(:course, :cover, :deletedQuestionIds, :deletedAlternativeIds)
 	end
 end
 end
