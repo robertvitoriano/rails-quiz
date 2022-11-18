@@ -1,7 +1,34 @@
 module Api
   module V1
     class UsersController < ApplicationController
-      before_action :authenticate_admin_request, only: [:create_admin]
+      before_action :authenticate_admin_request, only: [:create_admin, :index]
+
+      def index
+        page = index_params[:page] != nil ? index_params[:page].to_i : 1
+        limit = index_params[:limit] != nil ? index_params[:limit].to_i : 60
+        offset = page != nil ? (page - 1 ) * limit : 0
+        order = index_params[:order] != nil ? index_params[:order] : 'DESC'
+        begin
+				users = User.select("id, name, username, email, level, created_at as createdAt, updated_at as updatedAt")
+          .limit(limit)
+          .offset(offset)
+          .order('createdAt '+ order)
+
+        total = User.count('id')
+
+        render json: {
+          status:'SUCCESS',
+          message:'Loaded users',
+          data:{
+            users:users,
+            total:total
+          }
+        }, status: :ok
+
+        rescue Exception => ex
+          render json: {status:'error', message:ex}, status: :bad_request
+        end
+      end
       def create_user
         begin
           user = User.create({
@@ -44,7 +71,17 @@ module Api
           render json: { error: command.errors }, status: :unauthorized
         end
       end
-
+      def destroy
+        begin
+					User.delete(params[:id])
+          render json: {status:'SUCCESS', message:'deleted the user'}, status: :ok
+        rescue  Exception => ex
+          render json: {status:'error', message:ex}, status: :bad_request
+        end
+      end
+      def index_params
+        params.permit(:limit, :page, :order)
+      end
       def create_user_params
         params.permit(:name, :username, :email, :password)
       end

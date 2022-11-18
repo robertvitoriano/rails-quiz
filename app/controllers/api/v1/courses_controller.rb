@@ -101,7 +101,7 @@ module Api
 					s3_client = Aws::S3::Client.new(region: ENV["AWS_REGION"])
 					s3_client.delete_object({
 						bucket: "rails-quiz",
-						key: key.gsub("%20", " ") 	,
+						key: key.gsub("%20", " "),
 					})
 					Course.delete(params[:id])
 					render json: {status:'SUCCESS', message:'found and deleted the course'}, status: :ok
