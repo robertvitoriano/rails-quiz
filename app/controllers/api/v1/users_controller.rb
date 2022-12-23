@@ -1,7 +1,7 @@
 module Api
   module V1
     class UsersController < ApplicationController
-      before_action :authenticate_admin_request, only: [:create_admin, :index]
+      before_action :authenticate_admin_request, only: [:create_admin, :index, :destroy]
 
       def index
         page = index_params[:page] != nil ? index_params[:page].to_i : 1
@@ -9,21 +9,21 @@ module Api
         offset = page != nil ? (page - 1 ) * limit : 0
         order = index_params[:order] != nil ? index_params[:order] : 'DESC'
         begin
-				users = User.select("id, name, username, email, level, created_at as createdAt, updated_at as updatedAt")
-          .limit(limit)
-          .offset(offset)
-          .order('createdAt '+ order)
+          users = User.select("id, name, username, email, level, created_at as createdAt, updated_at as updatedAt")
+            .limit(limit)
+            .offset(offset)
+            .order('createdAt '+ order)
 
-        total = User.count('id')
+          total = User.count('id')
 
-        render json: {
-          status:'SUCCESS',
-          message:'Loaded users',
-          data:{
-            users:users,
-            total:total
-          }
-        }, status: :ok
+          render json: {
+            status:'SUCCESS',
+            message:'Loaded users',
+            data:{
+              users:users,
+              total:total
+            }
+          }, status: :ok
 
         rescue Exception => ex
           render json: {status:'error', message:ex}, status: :bad_request
