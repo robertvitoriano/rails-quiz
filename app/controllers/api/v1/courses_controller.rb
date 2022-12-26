@@ -31,7 +31,7 @@ module Api
 				total = Course.count('id')
 
 				render json: {
-					status:'SUCCESS',
+					status: 200,
 					message:'Loaded courses',
 					data:{
 						courses:courses,
@@ -60,7 +60,7 @@ module Api
           .order('courses.created_at '+ order)
 
 				render json: {
-					status:'SUCCESS',
+					status: 200,
 					message:'Loaded courses',
 					data:{
 						courses:courses,
@@ -85,7 +85,8 @@ module Api
 					})
 				end
 
-				render json: {status:'SUCCESS',
+				render json: {
+					status:200,
 					message:'found the course',
 					data:{
 						:course => course,
@@ -177,7 +178,7 @@ module Api
 						end
 
 						render json: {
-							status:'Saved Course',
+							status: 200,
 							message:'saved the course',
 							data:{:course => course,
 							}
@@ -243,7 +244,7 @@ module Api
 			end
 
 			render json: {
-				status:'Saved Course',
+				status: 200,
 				message:'saved the course',
 				data:{:course => course,
 					:questions => questions
