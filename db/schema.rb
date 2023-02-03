@@ -113,8 +113,8 @@ ActiveRecord::Schema[7.0].define(version: 2022_11_14_132828) do
     t.string "name"
     t.string "email"
     t.string "username"
-    t.datetime "created_at", default: -> { "current_timestamp(6)" }, null: false
-    t.datetime "updated_at", default: -> { "current_timestamp(6)" }, null: false
+    t.datetime "created_at", default: "2023-02-03 18:30:22", null: false
+    t.datetime "updated_at", default: "2023-02-03 18:30:22", null: false
     t.string "password_digest"
     t.column "level", "enum('user','admin')", default: "user"
   end

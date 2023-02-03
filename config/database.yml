@@ -17,7 +17,11 @@ development:
   host: <%= ENV['MYSQLDB_HOST'] %>
 test:
   <<: *default
-  database: rails_quiz_test
+  adapter: mysql2
+  database: <%= ENV['MYSQLDB_TEST_DATABASE'] %>
+  username: <%= ENV['MYSQLDB_TEST_USER'] %>
+  password: <%= ENV['MYSQLDB_ROOT_TEST_PASSWORD'] %>
+  host: <%= ENV['MYSQLDB__TEST_HOST'] %>
 
 production:
   <<: *default
