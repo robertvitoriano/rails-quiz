@@ -22,12 +22,11 @@ class ApplicationController < ActionController::API
       end
       if(decoded_auth_token[:level] == "admin")
       @current_user = AuthorizeApiRequest.call("admin", decoded_auth_token[:user_id] ).result
-       render json: { error: 'Not Authorized' }, status: 401 unless @current_user
       else
-       render json: { error: 'Not Authorized' }, status: 401 unless @current_user
+       render json: { error: 'Your not an admin' }, status: 403 unless @current_user
       end
     rescue StandardError => error
-      render json: { error: error }, status: 401 unless @current_user
+      render json: { error: error }, status: 500 unless @current_user
     end
   end
 
