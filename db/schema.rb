@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_11_14_132828) do
+ActiveRecord::Schema[7.0].define(version: 2023_02_20_204559) do
   create_table "active_storage_attachments", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -98,6 +98,12 @@ ActiveRecord::Schema[7.0].define(version: 2022_11_14_132828) do
     t.index ["course_question_id"], name: "index_question_alternatives_on_course_question_id"
   end
 
+  create_table "system_modules", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "user_alternatives", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -113,10 +119,11 @@ ActiveRecord::Schema[7.0].define(version: 2022_11_14_132828) do
     t.string "name"
     t.string "email"
     t.string "username"
-    t.datetime "created_at", default: "2023-02-03 18:30:22", null: false
-    t.datetime "updated_at", default: "2023-02-03 18:30:22", null: false
+    t.datetime "created_at", default: -> { "current_timestamp(6)" }, null: false
+    t.datetime "updated_at", default: -> { "current_timestamp(6)" }, null: false
     t.string "password_digest"
     t.column "level", "enum('user','admin')", default: "user"
+    t.string "avatar"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
