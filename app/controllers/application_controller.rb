@@ -58,11 +58,11 @@ class ApplicationController < ActionController::API
   end
 
   def upload_to_s3(s3_client, object_key, request_file)
-    @tmp_path = "#{Rails.root}/tmp/storage/course_covers"
+    @tmp_path = "#{Rails.root}/tmp/storage/user_avatar"
     write_file_to_storage(request_file, @tmp_path)
-    splitted_file_name = course_params[:cover].original_filename.split('.', 2)
+    splitted_file_name = request_file.original_filename.split('.', 2)
     file_format = splitted_file_name[1]
-    File.open(@tmp_path+'/'+course_params[:cover].original_filename, 'rb') do |file|
+    File.open(@tmp_path+'/'+request_file.original_filename, 'rb') do |file|
       s3_client.put_object(
         bucket: ENV["S3_BUCKET"],
         key: object_key,

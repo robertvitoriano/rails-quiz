@@ -31,11 +31,23 @@ module Api
       end
       def create_user
         begin
+          encoded_uri = nil
+          user_parsed = JSON.parse(create_user_params[:userInfo])
+
+          if  create_user_params[:avatar] != "null" and create_user_params[:avatar] != nil
+            object_key = create_user_params[:avatar].original_filename
+            s3_client = Aws::S3::Client.new(region: ENV["AWS_REGION"])
+            upload_to_s3(s3_client, object_key, create_user_params[:avatar])
+            uri_encoder = URI::Parser.new
+            encoded_uri = uri_encoder.escape("https://#{ENV["S3_BUCKET"]}.s3.amazonaws.com/#{object_key}")
+          end
+
           user = User.create({
-            name:create_user_params[:name],
-            username:create_user_params[:username],
-            email:create_user_params[:email],
-            password:create_user_params[:password],
+            name:user_parsed["name"],
+            username:user_parsed["username"],
+            email:user_parsed["email"],
+            password:user_parsed["password"],
+            avatar:encoded_uri,
             level:"user"
             })
           user.save!
@@ -45,7 +57,8 @@ module Api
             data:{
               name: user[:name],
               email: user[:email],
-              username: user[:username]
+              username: user[:username],
+              avatar: encoded_uri
           }}, status: :ok
         rescue  Exception => ex
           render json: {status:'Not saved', message:ex}, status: :bad_request
@@ -83,7 +96,7 @@ module Api
         params.permit(:limit, :page, :order)
       end
       def create_user_params
-        params.permit(:name, :username, :email, :password)
+        params.permit(:userInfo, :avatar)
       end
       def create_admin_params
         params.permit(:name, :username, :email, :password, :level)
