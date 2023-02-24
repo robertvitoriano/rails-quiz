@@ -16,7 +16,8 @@ class AuthenticateUser
           id:user.id,
           name:  user.name,
           username: user.username,
-          level: user.level
+          level: user.level,
+          avatar: user.avatar
         }
       }
 

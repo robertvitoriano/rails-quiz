@@ -1,2 +1,0 @@
-class CourseBatle < ApplicationRecord
-end
