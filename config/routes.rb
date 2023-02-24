@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
   namespace 'api' do
     namespace 'v1' do
-      resources :course_types, :course_questions
+      resources :course_types, :course_questions, :course_battles
       resources :courses do
         collection do
           get 'get-battle-courses', to:'courses#get_battle_courses'
@@ -19,6 +19,11 @@ Rails.application.routes.draw do
           post 'save-user-answer', to: 'question_alternatives#save_user_answer'
         end
       end
+      # resources :course_battles do
+      #   collection do
+      #     post 'create-course-battle', to: 'course_battles#create'
+      #   end
+      # end
     end
   end
 end
