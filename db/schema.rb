@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_02_24_193457) do
+ActiveRecord::Schema[7.0].define(version: 2023_02_24_200024) do
   create_table "active_storage_attachments", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -56,7 +56,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_24_193457) do
     t.integer "course_battle_id"
   end
 
-  create_table "course_battles", id: { type: :binary, limit: 16 }, charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+  create_table "course_battles", id: { type: :binary, limit: 36 }, charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.integer "course_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

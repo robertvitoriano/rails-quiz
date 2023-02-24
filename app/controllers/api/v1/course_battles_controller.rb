@@ -5,7 +5,10 @@ module Api
     before_action :authenticate_user_request, only: [:index]
       def create
         begin
-         course_battle_created = CourseBattle.create(course_battle_params)
+         course_battle_created = CourseBattle.create({
+          :name => course_battle_params[:name],
+          :course_id => course_battle_params[:course_id]
+        })
          course_battle_created.save!
          render json: {
           status: 200,
