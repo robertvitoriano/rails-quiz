@@ -2,7 +2,14 @@ module Api
   module V1
     class UsersController < ApplicationController
       before_action :authenticate_admin_request, only: [:create_admin, :index, :destroy]
+      before_action :authenticate_user_request, only: [:check_user]
 
+      def check_user
+        render json: {
+          status:'SUCCESS',
+          message:'User exists'
+        }, status: :ok
+      end
       def index
         page = index_params[:page] != nil ? index_params[:page].to_i : 1
         limit = index_params[:limit] != nil ? index_params[:limit].to_i : 60

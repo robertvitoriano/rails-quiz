@@ -12,6 +12,7 @@ Rails.application.routes.draw do
           post :login
           post 'create-user', to: 'users#create_user'
           post 'create-admin', to: 'users#create_admin'
+          get 'check-user', to: 'users#check_user'
         end
       end
       resources :alternatives do
@@ -19,11 +20,6 @@ Rails.application.routes.draw do
           post 'save-user-answer', to: 'question_alternatives#save_user_answer'
         end
       end
-      # resources :course_battles do
-      #   collection do
-      #     post 'create-course-battle', to: 'course_battles#create'
-      #   end
-      # end
     end
   end
 end
