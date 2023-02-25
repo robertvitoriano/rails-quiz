@@ -28,16 +28,16 @@ module Api
         end
       end
 
-      def show
+      def get_course_battle_users
         begin
-          course_battle = CourseBattle.select("*")
-                                      .joins(:course_battle_users)
-                                      .where({id:params['courseBattleId']})
+          course_battle_users = CourseBattleUser.select("course_battle_users.id, user_id, users.name")
+                                                .joins(:course_battle)
+                                                .joins(:user)
+                                                .where({course_battle_id:params['courseBattleId']})
           render json: {
             status: 200,
-            message:'saved the course battle',
-            data:{:courseBattle => course_battle,
-            }
+            message:'course battle users found',
+            data:{ :courseBattleUsers => course_battle_users }
           },
           status: :ok
 

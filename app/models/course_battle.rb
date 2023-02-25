@@ -1,4 +1,6 @@
 class CourseBattle < ApplicationRecord
+  has_many :course_batle_users
+
   before_create :set_uuid
   private
 
