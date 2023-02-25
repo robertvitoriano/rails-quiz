@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_02_25_122018) do
+ActiveRecord::Schema[7.0].define(version: 2023_02_25_130454) do
   create_table "active_storage_attachments", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -39,7 +39,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_25_122018) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
-  create_table "battles", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+  create_table "batles", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "title"
     t.integer "duration"
     t.datetime "created_at", null: false
@@ -47,7 +47,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_25_122018) do
   end
 
   create_table "course_battle_users", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
-    t.integer "user_id"
+    t.integer "user_id", null: false
     t.string "result"
     t.decimal "performance", precision: 10
     t.integer "time_spent"
@@ -111,7 +111,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_25_122018) do
     t.bigint "question_alternative_id"
     t.integer "course_battle_id"
     t.index ["question_alternative_id"], name: "index_user_alternatives_on_question_alternative_id"
-    t.index ["user_id", "question_alternative_id", "course_battle_id"], name: "unique_user_alternattive_index_by_battle", unique: true
+    t.index ["user_id", "question_alternative_id", "course_battle_id"], name: "unique_user_alternattive_index_by_batle", unique: true
     t.index ["user_id"], name: "index_user_alternatives_on_user_id"
   end
 
