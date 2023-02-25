@@ -6,9 +6,14 @@ module Api
       def create
         begin
          course_battle_created = CourseBattle.create({
-          :name => course_battle_params[:name],
-          :course_id => course_battle_params[:courseId]
+          :name => course_battle_creation_params[:name],
+          :course_id => course_battle_creation_params[:courseId]
         })
+        course_battle_user = CourseBattleUser.create({
+          course_battle_id: course_battle_created[:id],
+          user_id: course_battle_creation_params[:userId]
+        })
+
          course_battle_created.save!
          render json: {
           status: 200,
@@ -17,13 +22,32 @@ module Api
           }
         },
         status: :ok
+
         rescue  Exception => ex
           render json: {status:'Not saved', message:ex}, status: :bad_request
         end
       end
 
-      def course_battle_params
-        params.permit(:name, :courseId)
+      def show
+        begin
+          course_battle = CourseBattle.select("*")
+                                      .joins(:course_battle_users)
+                                      .where({id:params['courseBattleId']})
+          render json: {
+            status: 200,
+            message:'saved the course battle',
+            data:{:courseBattle => course_battle,
+            }
+          },
+          status: :ok
+
+        rescue Exception => ex
+          render json: {status:'Not saved', message:ex}, status: :bad_request
+        end
+      end
+
+      def course_battle_creation_params
+        params.permit(:name, :courseId, :userId)
       end
     end
   end

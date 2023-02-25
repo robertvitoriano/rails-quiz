@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_02_24_200024) do
+ActiveRecord::Schema[7.0].define(version: 2023_02_25_122018) do
   create_table "active_storage_attachments", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -39,7 +39,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_24_200024) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
-  create_table "batles", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+  create_table "battles", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "title"
     t.integer "duration"
     t.datetime "created_at", null: false
@@ -53,7 +53,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_24_200024) do
     t.integer "time_spent"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "course_battle_id"
+    t.binary "course_battle_id", limit: 36, null: false
   end
 
   create_table "course_battles", id: { type: :binary, limit: 36 }, charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
@@ -111,7 +111,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_24_200024) do
     t.bigint "question_alternative_id"
     t.integer "course_battle_id"
     t.index ["question_alternative_id"], name: "index_user_alternatives_on_question_alternative_id"
-    t.index ["user_id", "question_alternative_id", "course_battle_id"], name: "unique_user_alternattive_index_by_batle", unique: true
+    t.index ["user_id", "question_alternative_id", "course_battle_id"], name: "unique_user_alternattive_index_by_battle", unique: true
     t.index ["user_id"], name: "index_user_alternatives_on_user_id"
   end
 

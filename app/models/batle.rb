@@ -1,2 +1,2 @@
-class Batle < ApplicationRecord
+class Battle < ApplicationRecord
 end

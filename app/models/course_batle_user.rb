@@ -1,2 +1,2 @@
-class CourseBatleUser < ApplicationRecord
+class CourseBattleUser < ApplicationRecord
 end
