@@ -49,27 +49,27 @@ module Api
 
       def register_user
         begin
-          is_user_registed = CourseBattleUser.select("id").where({user_id:params["userId"]})
-
-          if is_user_registed.empty?
+          is_user_registered = CourseBattleUser.exists?(user_id: params["userId"], id:params['courseBattleId'])
+          if is_user_registered
+            render json: {
+              status: 200,
+              message: 'user already registered'
+            }, status: :ok
+          else
             CourseBattleUser.create({
               course_battle_id: params["courseBattleId"],
               user_id: params["userId"]
             })
             render json: {
               status: 200,
-              message:'user was register'
-            },
-            status: :ok
-          else
-            render json: {
-              status: 200,
-              message:'user already registered'
-            },
-            status: :ok
+              message: 'user was registered'
+            }, status: :ok
           end
-        rescue  Exception => ex
-          render json: {status:'user could not be registered', message:ex}, status: :bad_request
+        rescue Exception => ex
+          render json: {
+            status: 'user could not be registered',
+            message: ex.to_s
+          }, status: :bad_request
         end
       end
 
