@@ -23,6 +23,7 @@ Rails.application.routes.draw do
       resources :course_battles do
         collection do
           get 'get-course-battle-users/:courseBattleId', to: 'course_battles#get_course_battle_users'
+          post 'register-user', to: 'course_battles#register_user'
         end
       end
     end
