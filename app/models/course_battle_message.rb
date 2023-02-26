@@ -1,0 +1,2 @@
+class CourseBattleMessage < ApplicationRecord
+end
