@@ -31,10 +31,11 @@ module Api
 
       def get_course_battle_users
         begin
-          course_battle_users = CourseBattleUser.select("course_battle_users.id, user_id as userId, users.name")
+          course_battle_users = CourseBattleUser.select("course_battle_users.id, user_id as userId, users.name, users.avatar")
                                                 .joins(:course_battle)
                                                 .joins(:user)
                                                 .where({course_battle_id:params['courseBattleId']})
+                                                .order('course_battle_users.created_at ASC ')
           render json: {
             status: 200,
             message:'course battle users found',
