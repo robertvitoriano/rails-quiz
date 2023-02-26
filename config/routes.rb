@@ -26,6 +26,8 @@ Rails.application.routes.draw do
           post 'register-user', to: 'course_battles#register_user'
         end
       end
+
     end
   end
+  mount ActionCable.server => '/cable'
 end
