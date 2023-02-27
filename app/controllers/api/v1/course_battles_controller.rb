@@ -74,6 +74,40 @@ module Api
         end
       end
 
+      def send_message
+        begin
+          ActionCable.server.broadcast "course_battle_chat_#{params[:courseBattleId]}", { message: params['message'], userId: params['userId'] }
+          CourseBattleMessage.create({
+            user_id:params[:userId],
+            message:params[:message],
+            course_battle_id: params[:courseBattleId]
+          })
+          render json: {
+            status: 200,
+            message: 'messages saved',
+          }, status: :ok
+        rescue Exception => ex
+         render json: {status:'could not send message', message:ex}, status: :bad_request
+        end
+      end
+
+      def get_messages
+        begin
+        messages = CourseBattleMessage.select("id, user_id as userId, course_battle_id as courseBattleId").where({course_battle_id:params[:course_battle_id]})
+        render json: {
+          status: 200,
+          message: 'messages found',
+          data: {:messages => messages}
+        }, status: :ok
+
+        rescue Exception => ex
+        render json: {
+          status: 'could not get messages',
+          message: ex.to_s
+        }, status: :bad_request
+        end
+      end
+
       def course_battle_creation_params
         params.permit(:name, :courseId, :userId)
       end

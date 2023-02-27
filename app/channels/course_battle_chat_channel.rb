@@ -8,7 +8,6 @@ class CourseBattleChatChannel < ApplicationCable::Channel
   end
 
   def sendMessage(data)
-    ActionCable.server.broadcast "course_battle_chat_#{params[:courseBattleId]}", { message: data['message'], userId: data['userId'] }
 
   end
 end
