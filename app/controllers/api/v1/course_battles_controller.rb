@@ -76,7 +76,7 @@ module Api
 
       def send_message
         begin
-          ActionCable.server.broadcast "course_battle_chat_#{params[:courseBattleId]}", { message: params['message'], userId: params['userId'] }
+          ActionCable.server.broadcast "course_battle_chat_#{params[:courseBattleId]}", { message: params['message'], userId: params['userId'],type: "battle_room_message"}
           CourseBattleMessage.create({
             user_id:params[:userId],
             message:params[:message],

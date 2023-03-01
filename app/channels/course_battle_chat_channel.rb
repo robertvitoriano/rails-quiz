@@ -7,7 +7,14 @@ class CourseBattleChatChannel < ApplicationCable::Channel
     # Any cleanup needed when channel is unsubscribed
   end
 
-  def sendMessage(data)
+  def send_message(data)
 
   end
+  def send_is_typing(data)
+    ActionCable.server.broadcast("course_battle_chat_#{params[:courseBattleId]}",{userId:data["userId"], courseBattleId:params[:courseBattleId], type:"is_typing"})
+  end
+  def send_stop_typing(data)
+    ActionCable.server.broadcast("course_battle_chat_#{params[:courseBattleId]}", {userId:data["userId"],courseBattleId:params[:courseBattleId], type:"stop_typing"})
+  end
+
 end
