@@ -17,4 +17,8 @@ class CourseBattleChatChannel < ApplicationCable::Channel
     ActionCable.server.broadcast("course_battle_chat_#{params[:courseBattleId]}", {userId:data["userId"],courseBattleId:params[:courseBattleId], type:"stop_typing"})
   end
 
+  def send_start_course_battle_countdown(data)
+    ActionCable.server.broadcast("course_battle_chat_#{params[:courseBattleId]}", {userId:data["userId"], type:"start_course_battle_countdown"})
+  end
+
 end
