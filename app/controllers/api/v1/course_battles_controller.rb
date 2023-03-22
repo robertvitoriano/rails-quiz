@@ -63,6 +63,7 @@ module Api
             })
             user = User.find_by(id: params["userId"])
             ActionCable.server.broadcast("course_battle_chat_#{params["courseBattleId"]}",{userId:user.id, name:user.name, avatar:user.avatar,courseBattleId:params["courseBattleId"], type:"user_registered"})
+
             render json: {
               status: 200,
               message: 'user was registered'

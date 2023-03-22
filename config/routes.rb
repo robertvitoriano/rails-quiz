@@ -5,6 +5,7 @@ Rails.application.routes.draw do
       resources :courses do
         collection do
           get 'get-battle-courses', to:'courses#get_battle_courses'
+          get '/:courseBattleId', to: 'courses#show'
         end
       end
       resources :users do

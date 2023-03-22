@@ -69,8 +69,9 @@ module Api
 			end
 
 			def show
-				course = Course.select("id, title, goal, cover, course_type_id as courseTypeId").where("id = "+ params[:id]).first()
-				questions = CourseQuestion.select("id, question_text, course_id as courseId").where("course_id = "+ params[:id])
+				course_battle = CourseBattle.select('course_id').where("id = ?", params[:courseBattleId]).first()
+				course = Course.select("id, title, goal, cover, course_type_id as courseTypeId").where("id = ?", course_battle.course_id).first()
+				questions = CourseQuestion.select("id, question_text, course_id as courseId").where("course_id = ?", course_battle.course_id)
 				questions_result = []
 				question_ids = questions.map { |question| question.id }
 				course_alternatives = QuestionAlternative.select("alternative_text as text, course_question_id as questionId, is_right as isRight, id").where(course_question_id: question_ids)
@@ -92,7 +93,8 @@ module Api
 						:course => course,
 						:questions => questions_result,
 						:courseType => course_type
-					}},
+					}
+				},
 					status: :ok
 				end
 
