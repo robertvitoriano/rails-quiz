@@ -7,7 +7,8 @@ module Api
         begin
           user_answer = UserAlternative.create({
             :user_id => current_user_id,
-            :question_alternative_id => save_user_answer_params['questionAlternativeId']
+            :question_alternative_id => save_user_answer_params['questionAlternativeId'],
+            :course_battle_id => params['courseBattleId']
           })
           user_answer.save!
           render json: {status:'SUCCESS', message:'saved user answer', data: user_answer}, status: :ok
@@ -17,7 +18,7 @@ module Api
       end
 
      def save_user_answer_params
-      params.permit(:questionAlternativeId)
+      params.permit(:questionAlternativeId, :courseBattleId)
      end
 
     end

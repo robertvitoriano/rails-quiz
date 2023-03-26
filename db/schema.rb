@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_02_27_000433) do
+ActiveRecord::Schema[7.0].define(version: 2023_03_26_013817) do
   create_table "active_storage_attachments", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -117,7 +117,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_27_000433) do
     t.datetime "updated_at", null: false
     t.bigint "user_id"
     t.bigint "question_alternative_id"
-    t.integer "course_battle_id"
+    t.binary "course_battle_id", limit: 36, null: false
     t.index ["question_alternative_id"], name: "index_user_alternatives_on_question_alternative_id"
     t.index ["user_id", "question_alternative_id", "course_battle_id"], name: "unique_user_alternattive_index_by_batle", unique: true
     t.index ["user_id"], name: "index_user_alternatives_on_user_id"
