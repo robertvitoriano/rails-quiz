@@ -17,6 +17,9 @@ module Api
         end
       end
 
+      def get_user_answers
+      end
+
      def save_user_answer_params
       params.permit(:questionAlternativeId, :courseBattleId)
      end
