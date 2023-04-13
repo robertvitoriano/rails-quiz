@@ -99,6 +99,15 @@ module Api
           render json: {status:'error', message:ex}, status: :bad_request
         end
       end
+      def get_user_friends
+        begin
+					friends = Friend.select("*")
+          puts(friends.to_s)
+          render json: {status:'SUCCESS', data: friends}, status: :ok
+        rescue  Exception => ex
+          render json: {status:'error', message:ex}, status: :bad_request
+        end
+      end
       def index_params
         params.permit(:limit, :page, :order)
       end
