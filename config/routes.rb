@@ -15,6 +15,7 @@ Rails.application.routes.draw do
           post 'create-admin', to: 'users#create_admin'
           get 'check-user', to: 'users#check_user'
           get 'friends/:userId', to: 'users#get_user_friends'
+          post 'friends/add-friend', to: 'users#add_friend'
         end
       end
       resources :alternatives do
