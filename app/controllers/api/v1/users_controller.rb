@@ -101,16 +101,16 @@ module Api
       end
       def get_user_friends
         begin
-					friends = UserFriend.select("*").where('user_id=')
+					friends = UserFriend.select("*")
           render json: {status:'SUCCESS', data: friends}, status: :ok
         rescue  Exception => ex
-          render json: {status:'error', message:ex}, status: :bad_request
+          render json: {status:'error', message:ex}, status: :bad_request.where('user_id=')
         end
       end
       def add_friend
         begin
           user_friend = UserFriend.create({
-            user_id1:add_friend_params['userId1'],
+            user_id1:current_user_id,
             user_id2:add_friend_params['userId2']
           })
           user_friend.save!
@@ -134,7 +134,7 @@ module Api
         params.permit(:username,:password)
       end
       def add_friend_params
-        params.permit(:userId1,:userId2)
+        params.permit(:userId2)
       end
   end
   end
