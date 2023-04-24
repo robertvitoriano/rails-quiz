@@ -1,8 +1,8 @@
 module Api
   module V1
     class UsersController < ApplicationController
-      before_action :authenticate_admin_request, only: [:create_admin, :index, :destroy]
-      before_action :authenticate_user_request, only: [:check_user]
+      before_action :authenticate_admin_request, only: [:create_admin, :index, :destroy,]
+      before_action :authenticate_user_request, only: [:check_user, :get_user_friends, :add_friend, :set_friendship_result, :unfriend ]
 
       def check_user
         render json: {
@@ -101,25 +101,49 @@ module Api
       end
       def get_user_friends
         begin
-					friends = UserFriend.select("*")
+          friends = UserFriend.select("*")
+          .joins("JOIN users ON users.id = user_friends.user_id1 OR users.id = user_friends.user_id2")
+          .where("(user_friends.user_id1 = ? OR user_friends.user_id2 = ?) AND user_friends.status = ?", current_user_id, current_user_id, "accepted")
+
           render json: {status:'SUCCESS', data: friends}, status: :ok
+
         rescue  Exception => ex
-          render json: {status:'error', message:ex}, status: :bad_request.where('user_id=')
+          render json: {status:'error', message:ex}, status: :bad_request
         end
       end
       def add_friend
         begin
-          user_friend = UserFriend.create({
-            user_id1:current_user_id,
-            user_id2:add_friend_params['userId2']
-          })
-          user_friend.save!
-          render json: {status:'SUCCESS', data: user_friend}, status: :ok
+          user_friend_already_exist = UserFriend.where("
+            ((user_friends.user_id1 = ? OR user_friends.user_id2 = ?) OR user_friends.user_id2 = ? OR user_friends.user_id1 = ?)
+            AND user_friends.status <> ?",
+          current_user_id,add_friend_params['userId2'],current_user_id,add_friend_params['userId2'], "rejected")
+
+          if user_friend_already_exist.present?
+            render json: {status:'friendship already created', message:ex}, status: :bad_request
+            else
+              user_friend = UserFriend.create({
+                user_id1:current_user_id,
+                user_id2:add_friend_params['userId2']
+              })
+              user_friend.save!
+              render json: {status:'SUCCESS', data: user_friend}, status: :ok
+          end
+
 
         rescue Exception =>ex
           render json: {status:'error', message:ex}, status: :bad_request
 
         end
+      end
+
+      def set_friendship_result
+        query = UserFriend.where(user_id1: friendship_result_params['userId1'], user_id2: current_user_id)
+        puts query.to_sql
+        query.update(status: friendship_result_params['result'])
+      end
+
+      def unfriend
+
       end
       def index_params
         params.permit(:limit, :page, :order)
@@ -135,6 +159,9 @@ module Api
       end
       def add_friend_params
         params.permit(:userId2)
+      end
+      def friendship_result_params
+        params.permit(:userId1, :result)
       end
   end
   end

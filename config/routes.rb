@@ -16,6 +16,7 @@ Rails.application.routes.draw do
           get 'check-user', to: 'users#check_user'
           get 'friends/:userId', to: 'users#get_user_friends'
           post 'friends/add-friend', to: 'users#add_friend'
+          put 'friends/friendship-result', to:'users#set_friendship_result'
         end
       end
       resources :alternatives do
