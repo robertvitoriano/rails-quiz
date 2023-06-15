@@ -18,7 +18,21 @@ class CourseBattleChatChannel < ApplicationCable::Channel
   end
 
   def send_course_battle_decrease_countdown(data)
-    ActionCable.server.broadcast("course_battle_chat_#{params[:courseBattleId]}", {userId:data["userId"], type:"course_battle_decrease_countdown"})
+    ActionCable.server.broadcast("course_battle_chat_#{params[:courseBattleId]}", 
+      {
+        userId:data["userId"],
+        type:"course_battle_decrease_countdown"
+      })
+  end
+  
+  def send_invite_notification_to_friend(data)
+    ActionCable.server.broadcast("user_notification_#{data["friendId"]}", 
+      {
+       friendId: data["friendId"],
+       type:"notification_to_join_course_battle",
+       courseBattleUrl: data["courseBattleUrl"],
+       userId: data["userId"]
+      })
   end
 
 end

@@ -129,7 +129,6 @@ module Api
               render json: {status:'SUCCESS', data: user_friend}, status: :ok
           end
 
-
         rescue Exception =>ex
           render json: {status:'error', message:ex}, status: :bad_request
 
