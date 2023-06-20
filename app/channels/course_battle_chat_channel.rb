@@ -30,8 +30,9 @@ class CourseBattleChatChannel < ApplicationCable::Channel
       {
        friendId: data["friendId"],
        type:"notification_to_join_course_battle",
-       courseBattleUrl: data["courseBattleUrl"],
-       userId: data["userId"]
+       courseBattleId: params[:courseBattleId],
+       opponentName: data["userName"],
+       courseName: data["courseName"]
       })
   end
 

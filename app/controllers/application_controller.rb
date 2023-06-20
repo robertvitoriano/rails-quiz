@@ -72,9 +72,9 @@ class ApplicationController < ActionController::API
         body: file
       )
     end
-  rescue StandardError => e
-    puts "Error uploading object: #{e.message}"
-    return false
+    rescue StandardError => e
+      puts "Error uploading object: #{e.message}"
+      return false
   end
 
 end
