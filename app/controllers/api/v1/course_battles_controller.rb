@@ -96,12 +96,14 @@ module Api
 
       def get_messages
         begin
-        messages = CourseBattleMessage.select("id,
-                                              user_id as userId,
-                                              course_battle_id as courseBattleId,
-                                              message,
-                                              created_at as createdAt")
-                                              .where({course_battle_id:params[:course_battle_id]})
+        messages = CourseBattleMessage
+        .select("id,
+          user_id as userId,
+          course_battle_id as courseBattleId,
+          message,
+          created_at as createdAt")
+          .where({course_battle_id:params[:course_battle_id]})
+          
         render json: {
           status: 200,
           message: 'messages found',
