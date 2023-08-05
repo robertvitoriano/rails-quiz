@@ -2,7 +2,7 @@ module Api
   module V1
     class UsersController < ApplicationController
       before_action :authenticate_admin_request, only: [:create_admin, :index, :destroy,]
-      before_action :authenticate_user_request, only: [:check_user, :get_user_friends, :add_friend, :set_friendship_result, :unfriend ]
+      before_action :authenticate_user_request, only: [:check_user, :get_user_friends, :add_friend, :set_friendship_result, :unfriend, :list_non_friends ]
 
       def check_user
         render json: {
@@ -71,7 +71,25 @@ module Api
           render json: {status:'Not saved', message:ex}, status: :bad_request
         end
       end
+      
+      def list_non_friends
+        begin
+          user_friends = UserFriend.where("friendships.user_id1 = :current_user_id
+                                       OR friendships.user_id2 = :current_user_id,
+                                       AND status = :accepted_status",
+                                       current_user_id: current_user_id, 
+                                       accepted_status:"accepted",
+                                      ).distinct
+                               
+          #todo add declined friendships
+          #fazer where not onde um dos ids do user_friend for igual ao do usuário logado
+          #result = User.where.not(id: subquery).select(:id, :username)
+          render json: {status:'actual friends', data:user_friends}, status: :ok
 
+        rescue Exception => ex
+          render json: {status:'error', message:ex}, status: :internal_server_error
+        end
+      end
       def create_admin
         begin
           user = User.create(create_admin_params)
@@ -114,9 +132,8 @@ module Api
       def add_friend
         begin
           user_friend_already_exist = UserFriend.where("
-            ((user_friends.user_id1 = ? OR user_friends.user_id2 = ?) OR user_friends.user_id2 = ? OR user_friends.user_id1 = ?)
-            AND user_friends.status <> ?",
-          current_user_id,add_friend_params['userId2'],current_user_id,add_friend_params['userId2'], "rejected")
+            ((user_friends.user_id1 = :current_user_id AND user_friends.user_id2 = :userId2) OR user_friends.user_id2 = :current_user_id AND user_friends.user_id1 = :userId2)
+            AND user_friends.status <> :rejected_status", current_user_id: current_user_id, userId2: add_friend_params['userId2'], rejected_status: "rejected")
 
           if user_friend_already_exist.present?
             render json: {status:'friendship already created', message:ex}, status: :bad_request
