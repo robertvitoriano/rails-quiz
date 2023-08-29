@@ -74,22 +74,24 @@ module Api
       
       def list_non_friends
         begin
-          user_friends = UserFriend.where("friendships.user_id1 = :current_user_id
-                                       OR friendships.user_id2 = :current_user_id,
-                                       AND status = :accepted_status",
-                                       current_user_id: current_user_id, 
-                                       accepted_status:"accepted",
-                                      ).distinct
-                               
-          #todo add declined friendships
-          #fazer where not onde um dos ids do user_friend for igual ao do usuário logado
-          #result = User.where.not(id: subquery).select(:id, :username)
-          render json: {status:'actual friends', data:user_friends}, status: :ok
+          user_friends = UserFriend.where("(user_friends.user_id1 = :current_user_id
+                                           OR user_friends.user_id2 = :current_user_id)
+                                           AND status = :accepted_status",
+                                           current_user_id: current_user_id, 
+                                           accepted_status: "accepted")
+      
+          friends_ids = user_friends.flat_map do |friendship|
+            [friendship.user_id1, friendship.user_id2]
+          end.uniq
+      
 
+          result = User.where.not(id: friends_ids).select(:id, :username)
+          render json: { status: 'actual friends', data: result }, status: :ok
         rescue Exception => ex
-          render json: {status:'error', message:ex}, status: :internal_server_error
+          render json: { status: 'error', message: ex }, status: :internal_server_error
         end
       end
+      
       def create_admin
         begin
           user = User.create(create_admin_params)

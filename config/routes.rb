@@ -14,10 +14,10 @@ Rails.application.routes.draw do
           post 'create-user', to: 'users#create_user'
           post 'create-admin', to: 'users#create_admin'
           get 'check-user', to: 'users#check_user'
-          get 'friends/:userId', to: 'users#get_user_friends'
           post 'friends/add-friend', to: 'users#add_friend'
           put 'friends/friendship-result', to:'users#set_friendship_result'
-          get 'friends/non-friends', to:'users#list_non_friends'
+          get 'friends/non-friends', to: 'users#list_non_friends'
+          get 'friends/:userId', to: 'users#get_user_friends'
         end
       end
       resources :alternatives do
