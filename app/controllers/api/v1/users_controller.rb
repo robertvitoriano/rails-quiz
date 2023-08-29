@@ -85,8 +85,37 @@ module Api
           end.uniq
       
 
-          result = User.where.not(id: friends_ids).select(:id, :username)
-          render json: { status: 'actual friends', data: result }, status: :ok
+          non_friends = User.where.not(id: friends_ids).select(:id, :username)
+          
+          non_friends_ids = non_friends.map do |non_friend| non_friend.id end
+            
+          non_friends_status = UserFriend.select("user_id1, user_id2, status").where(
+            "(user_id1 IN (:non_friends_ids) OR user_id2 IN (:non_friends_ids))
+            AND (user_id1 = :current_user_id OR user_id2 = :current_user_id)",
+            non_friends_ids: non_friends_ids,
+            current_user_id: current_user_id
+          )    
+          
+          non_friends_result = non_friends.map do |non_friend|
+            non_friend_status_match = non_friends_status.find do |non_friend_status|
+              non_friend.id == non_friend_status.user_id1 || non_friend.id == non_friend_status.user_id2
+            end
+          
+            if non_friend_status_match
+              {
+                status: non_friend_status_match.status,
+                id: non_friend.id,
+                username: non_friend.username
+              }
+            else
+              {
+                status: nil,
+                id: non_friend.id,
+                username: non_friend.username                  
+              }
+            end
+          end
+          render json: { status: 'non friends', data: non_friends_result}, status: :ok
         rescue Exception => ex
           render json: { status: 'error', message: ex }, status: :internal_server_error
         end
