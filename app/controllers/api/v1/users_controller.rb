@@ -103,13 +103,13 @@ module Api
           
             if non_friend_status_match
               {
-                status: non_friend_status_match.status,
+                pending: non_friend_status_match.status === 'pending',
                 id: non_friend.id,
                 username: non_friend.username
               }
             else
               {
-                status: nil,
+                pending: false,
                 id: non_friend.id,
                 username: non_friend.username                  
               }
