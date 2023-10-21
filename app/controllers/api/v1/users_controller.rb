@@ -165,15 +165,20 @@ module Api
           user_friend_already_exist = UserFriend.where("
             ((user_friends.user_id1 = :current_user_id AND user_friends.user_id2 = :userId2) OR user_friends.user_id2 = :current_user_id AND user_friends.user_id1 = :userId2)
             AND user_friends.status <> :rejected_status", current_user_id: current_user_id, userId2: add_friend_params['userId2'], rejected_status: "rejected")
-
+          
           if user_friend_already_exist.present?
-            render json: {status:'friendship already created', message:ex}, status: :bad_request
+            render json: {status:'friendship already created', message:"Friendship with this user was already tried!"}, status: :bad_request
             else
               user_friend = UserFriend.create({
                 user_id1:current_user_id,
                 user_id2:add_friend_params['userId2']
               })
               user_friend.save!
+              ActionCable.server.broadcast("user_notification_#{add_friend_params['userId2']}", 
+                {
+                  userId:current_user_id,
+                  type:"friendship_request_notification"
+                })
               render json: {status:'SUCCESS', data: user_friend}, status: :ok
           end
 
