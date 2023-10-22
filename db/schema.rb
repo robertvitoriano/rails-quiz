@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_04_21_214327) do
+ActiveRecord::Schema[7.0].define(version: 2023_10_22_050036) do
   create_table "active_storage_attachments", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -97,6 +97,22 @@ ActiveRecord::Schema[7.0].define(version: 2023_04_21_214327) do
     t.index ["user_id"], name: "index_courses_on_user_id"
   end
 
+  create_table "notification_types", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "notifications", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+    t.bigint "notification_type_id"
+    t.boolean "read"
+    t.bigint "notifier_id"
+    t.bigint "notified_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["notification_type_id"], name: "fk_rails_75cdc2096d"
+  end
+
   create_table "question_alternatives", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "alternative_text"
     t.boolean "is_right"
@@ -149,6 +165,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_04_21_214327) do
   add_foreign_key "course_questions", "courses", on_delete: :cascade
   add_foreign_key "courses", "course_types"
   add_foreign_key "courses", "users"
+  add_foreign_key "notifications", "notification_types"
   add_foreign_key "question_alternatives", "course_questions"
   add_foreign_key "question_alternatives", "course_questions", on_delete: :cascade
   add_foreign_key "user_alternatives", "question_alternatives"
