@@ -8,6 +8,11 @@ Rails.application.routes.draw do
           get '/:courseBattleId', to: 'courses#show'
         end
       end
+      resources :notifications do
+        collection do
+          get '/notifications', to:'notifications#get_notifications'
+        end
+      end
       resources :users do
         collection do
           post :login
