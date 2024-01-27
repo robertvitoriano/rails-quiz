@@ -174,6 +174,7 @@ module Api
                 user_id2:add_friend_params['userId2']
               })
               user_friend.save!
+              Api::V1::NotificationService.create_notification(current_user_id, add_friend_params['userId2'], 1)
               ActionCable.server.broadcast("user_notification_#{add_friend_params['userId2']}", 
                 {
                   userId:current_user_id,
