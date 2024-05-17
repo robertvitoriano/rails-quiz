@@ -34,7 +34,7 @@ module RailsQuiz
     end
   # Disable Zeitwerk autoloading errors for missing constants
   config.autoloader = :zeitwerk
-  config.autoloader = Zeitwerk::Railtie::Autoloader.new # You might need to specify the autoloader explicitly
+  config.autoloader = Zeitwerk::Loader.new 
   config.autoloader.check_and_skip_autoloading_errors = true
   end
 end
