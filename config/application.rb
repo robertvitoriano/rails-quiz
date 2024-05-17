@@ -32,6 +32,8 @@ module RailsQuiz
          resource '*', :headers => :any, :methods => [:get, :post, :options, :patch, :delete]
        end
     end
-
+     # Disable Zeitwerk autoloading errors for missing constants
+  config.autoloader = :zeitwerk
+  config.autoloaders.zeitwerk.check_and_skip_autoloading_errors = true
   end
 end
