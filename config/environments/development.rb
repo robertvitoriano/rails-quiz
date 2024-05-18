@@ -52,12 +52,10 @@ Rails.application.configure do
 
   # Highlight code that triggered database queries in logs.
   config.active_record.verbose_query_logs = true
+  config.action_cable.disable_request_forgery_protection = true
+  config.action_cable.url = "ws://localhost:4000/cable"
+  config.action_cable.allowed_request_origins = [/http:\/\/*/, /https:\/\/*/]
 
-  config.action_cable.url = "wss://main-backend.robertvitoriano.com:4000/cable"
-  config.action_cable.allowed_request_origins = [
-    'https://main-backend.robertvitoriano.com',
-    %r{https://main-backend\.robertvitoriano\.com.*}
-  ]
 
   config.hosts << "main-backend.robertvitoriano.com:4000"
 
