@@ -40,6 +40,7 @@ Rails.application.configure do
     'https://main-backend.robertvitoriano.com',
     %r{https://main-backend\.robertvitoriano\.com.*}
   ]
+
   config.hosts << "main-backend.robertvitoriano.com:4000"
   # config.action_cable.allowed_request_origins = [ "http://example.com", /http:\/\/example.*/ ]
 

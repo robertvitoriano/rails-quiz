@@ -58,7 +58,9 @@ Rails.application.configure do
     'https://main-backend.robertvitoriano.com',
     %r{https://main-backend\.robertvitoriano\.com.*}
   ]
+
   config.hosts << "main-backend.robertvitoriano.com:4000"
+
   # Raises error for missing translations.
   # config.i18n.raise_on_missing_translations = true
 
