@@ -52,9 +52,11 @@ class ApplicationController < ActionController::API
   end
 
   def write_file_to_storage(file, path)
-    FileUtils.mkdir(path) unless File.exists?(path)
-
-    File.open(File.join(path,file.original_filename),"wb") { |f| f.write(file.read)}
+    FileUtils.mkdir_p(path) unless File.exist?(path)
+  
+    File.open(File.join(path, file.original_filename), "wb") do |f|
+      f.write(file.read)
+    end
   end
 
   def upload_to_s3(s3_client, object_key, request_file)
