@@ -42,7 +42,7 @@ module Api
           user_parsed = JSON.parse(create_user_params[:userInfo])
 
           if  create_user_params[:avatar] != "null" and create_user_params[:avatar] != nil
-            object_key = create_user_params[:avatar].original_filename
+            object_key = "user_avatars/#{user_parsed["username"]}/#{create_user_params[:avatar].original_filename}"
             s3_client = Aws::S3::Client.new(region: ENV["AWS_REGION"])
             upload_to_s3(s3_client, object_key, create_user_params[:avatar])
             uri_encoder = URI::Parser.new

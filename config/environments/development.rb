@@ -67,4 +67,22 @@ Rails.application.configure do
 
   # Uncomment if you wish to allow Action Cable access from any origin.
   # config.action_cable.disable_request_forgery_protection = true
+  
+  
+  #####################################LOGGING CONFIGURATION################################
+    # Include generic and useful information about system operation, but avoid logging too much
+  # information to avoid inadvertent exposure of personally identifiable information (PII).
+   # Use the default Rails logger
+   config.log_level = :info  # Set the log level to :debug, :info, :warn, :error, or :fatal
+
+   # Prepend all log lines with the following tags
+   config.log_tags = [:request_id]
+
+   # Use the lowest log level to ensure availability of diagnostic information when problems arise.
+   config.log_level = :debug 
+ 
+   # Production log format is concise
+   config.log_formatter = ::Logger::Formatter.new
+ 
+   # Rotate logs to limit file size and maintain history  
 end
