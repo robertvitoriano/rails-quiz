@@ -77,7 +77,7 @@ module Api
           user_friends = UserFriend.where("(user_friends.user_id1 = :current_user_id
                                            OR user_friends.user_id2 = :current_user_id)
                                            AND status = :accepted_status",
-                                           current_user_id: current_user_id, 
+                                           current_user_id: current_user[:id], 
                                            accepted_status: "accepted")
       
           friends_ids = user_friends.flat_map do |friendship|
@@ -93,7 +93,7 @@ module Api
             "(user_id1 IN (:non_friends_ids) OR user_id2 IN (:non_friends_ids))
             AND (user_id1 = :current_user_id OR user_id2 = :current_user_id)",
             non_friends_ids: non_friends_ids,
-            current_user_id: current_user_id
+            current_user_id: current_user[:id]
           )    
           
           non_friends_result = non_friends.map do |non_friend|
@@ -152,7 +152,7 @@ module Api
         begin
           friends = UserFriend.select("*")
           .joins("JOIN users ON users.id = user_friends.user_id1 OR users.id = user_friends.user_id2")
-          .where("(user_friends.user_id1 = ? OR user_friends.user_id2 = ?) AND user_friends.status = ?", current_user_id, current_user_id, "accepted")
+          .where("(user_friends.user_id1 = ? OR user_friends.user_id2 = ?) AND user_friends.status = ?", current_user[:id], current_user[:id], "accepted")
 
           render json: {status:'SUCCESS', data: friends}, status: :ok
 
@@ -164,20 +164,20 @@ module Api
         begin
           user_friend_already_exist = UserFriend.where("
             ((user_friends.user_id1 = :current_user_id AND user_friends.user_id2 = :userId2) OR user_friends.user_id2 = :current_user_id AND user_friends.user_id1 = :userId2)
-            AND user_friends.status <> :rejected_status", current_user_id: current_user_id, userId2: add_friend_params['userId2'], rejected_status: "rejected")
+            AND user_friends.status <> :rejected_status", current_user_id: current_user[:id], userId2: add_friend_params['userId2'], rejected_status: "rejected")
           
           if user_friend_already_exist.present?
             render json: {status:'friendship already created', message:"Friendship with this user was already tried!"}, status: :bad_request
             else
               user_friend = UserFriend.create({
-                user_id1:current_user_id,
+                user_id1:current_user[:id],
                 user_id2:add_friend_params['userId2']
               })
               user_friend.save!
-              Api::V1::NotificationService.create_notification(current_user_id, add_friend_params['userId2'], 1)
+              Api::V1::NotificationService.create_notification(current_user[:id], add_friend_params['userId2'], 1)
               ActionCable.server.broadcast("user_notification_#{add_friend_params['userId2']}", 
                 {
-                  userId:current_user_id,
+                  userId:current_user[:id],
                   type:"friendship_request_notification"
                 })
               render json: {status:'SUCCESS', data: user_friend}, status: :ok
@@ -190,7 +190,7 @@ module Api
       end
 
       def set_friendship_result
-        query = UserFriend.where(user_id1: friendship_result_params['userId1'], user_id2: current_user_id)
+        query = UserFriend.where(user_id1: friendship_result_params['userId1'], user_id2: current_user[:id])
         puts query.to_sql
         query.update(status: friendship_result_params['result'])
       end

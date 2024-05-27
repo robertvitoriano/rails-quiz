@@ -47,8 +47,8 @@ class ApplicationController < ActionController::API
   end
 
 
-  def current_user_id
-    @current_user[:id]
+  def current_user
+    @current_user
   end
 
   def write_file_to_storage(file, path)

@@ -82,7 +82,7 @@ module Api
 					'id, 
 					user_id as userId, 
 					question_id as questionId,
-					question_alternative_id as questionAlternative,id, 
+					question_alternative_id as questionAlternativeId,id, 
 					course_battle_id as courseBattleId, 
 					created_at as createdAt').where(question_id: question_ids)
 				course_type = CourseType.select("id, title").where("id = "+course.courseTypeId.to_s)
@@ -152,7 +152,7 @@ module Api
 								:title => course_parsed['title'],
 								:goal => course_parsed['goal'],
 								:course_type_id => course_parsed["courseTypeId"],
-								:user_id => current_user_id,
+								:user_id => current_user[:id],
 								:cover => encoded_uri == nil ? course_parsed['oldCover'] : encoded_uri,
 								:updated_at => Time.zone.now
 							}
@@ -223,7 +223,7 @@ module Api
 							:title => course_parsed['title'],
 							:goal => course_parsed['goal'],
 							:course_type_id => course_parsed['courseTypeId'],
-							:user_id => current_user_id,
+							:user_id => current_user[:id],
 							:cover => encoded_uri
 						}
 					)

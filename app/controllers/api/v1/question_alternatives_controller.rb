@@ -6,7 +6,7 @@ module Api
       def save_user_answer
         begin
           user_answer = UserAlternative.create({
-            :user_id => current_user_id,
+            :user_id => current_user[:id],
             :question_id => save_user_answer_params['questionId'],
             :question_alternative_id => save_user_answer_params['questionAlternativeId'],
             :course_battle_id => params['courseBattleId']

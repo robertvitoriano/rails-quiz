@@ -10,7 +10,7 @@ module Api
                                              notified_id, 
                                              notification_type_id, 
                                              is_read")
-                                             .where("notified_id = :user_id", user_id: current_user_id.to_i)
+                                             .where("notified_id = :user_id", user_id: current_user[:id].to_i)
                                              
           render json: {status:'SUCCESS', message:'notifications found!', data: notifications}, status: :ok
           
