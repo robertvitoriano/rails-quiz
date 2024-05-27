@@ -36,6 +36,8 @@ Rails.application.routes.draw do
           post 'register-user', to: 'course_battles#register_user'
           post 'send-course-battle-message', to: 'course_battles#send_message'
           get 'get-course-battle-messages/:course_battle_id', to: 'course_battles#get_messages'
+          post 'finish-course-battle', to: 'course_battles#finish_course_battle'
+
         end
       end
 

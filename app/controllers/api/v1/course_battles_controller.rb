@@ -1,32 +1,32 @@
 module Api
   module V1
    class CourseBattlesController < ApplicationController
-    before_action :authenticate_user_request, only: [:create]
-    before_action :authenticate_user_request, only: [:index]
-    def create
-      begin
-        course_battle_created = CourseBattle.create({
-          name: course_battle_creation_params[:name],
-          course_id: course_battle_creation_params[:courseId]
-        })
-        course_battle_user = CourseBattleUser.create({
-          course_battle_id: course_battle_created[:id],
-          user_id: course_battle_creation_params[:userId]
-        })
+      before_action :authenticate_user_request, only: [:create]
+      before_action :authenticate_user_request, only: [:index]
+      def create
+        begin
+          course_battle_created = CourseBattle.create({
+            name: course_battle_creation_params[:name],
+            course_id: course_battle_creation_params[:courseId]
+          })
+          course_battle_user = CourseBattleUser.create({
+            course_battle_id: course_battle_created[:id],
+            user_id: course_battle_creation_params[:userId]
+          })
 
-        render json: {
-          status: 200,
-          message: 'saved the course battle',
-          data: { courseBattle: course_battle_created }
-        }, status: :ok
+          render json: {
+            status: 200,
+            message: 'saved the course battle',
+            data: { courseBattle: course_battle_created }
+          }, status: :ok
 
-      rescue ActiveRecord::RecordInvalid => ex
-        render json: {
-          status: 'Not saved',
-          message: ex.message
-        }, status: :bad_request
+        rescue ActiveRecord::RecordInvalid => ex
+          render json: {
+            status: 'Not saved',
+            message: ex.message
+          }, status: :bad_request
+        end
       end
-    end
 
 
       def get_course_battle_users
@@ -90,7 +90,7 @@ module Api
             message: 'messages saved',
           }, status: :ok
         rescue Exception => ex
-         render json: {status:'could not send message', message:ex}, status: :bad_request
+          render json: {status:'could not send message', message:ex}, status: :bad_request
         end
       end
 
@@ -117,9 +117,60 @@ module Api
         }, status: :bad_request
         end
       end
+      def finish_course_battle
+        begin
+          user_course_register = CourseBattleUser.select(
+            "result,
+            performance,
+            time_spent"
+          ).where({           
+             user_id: current_user[:id],
+             id: finish_course_battle_params["courseBattleId"]
+            })
 
+          if user_course_register == nil
+            render json: {
+              status: 400,
+              message: 'user not registered in quiz'
+            }, status: :bad_request
+          end
+          
+          if user_course_register.result != nil || user_course_register.performance != nil || user_course_register.time_spent != nil
+            render json: {
+              status: 400,
+              message: 'user already finished quiz battle'
+            }, status: :bad_request
+          end
+          
+
+          ActionCable.server.broadcast(
+            "course_battle_chat_#{params["courseBattleId"]}",
+            {
+              userId: current_user.id,
+              name: current_user.name,
+              avatar: current_user.avatar,
+              courseBattleId: params["courseBattleId"],
+              type: "opponent_finished_quiz_battle"
+            }
+          )
+      
+          render json: {
+            status: 200,
+            message: 'quiz battle finished'
+          }, status: :ok
+        rescue StandardError => ex
+          render json: {
+            status: 'error finishing quiz battle',
+            message: ex.to_s
+          }, status: :bad_request
+        end
+      end
+        
       def course_battle_creation_params
         params.permit(:name, :courseId, :userId)
+      end      
+      def finish_course_battle_params
+        params.permit(:courseBattleId, :courseId, :userChosenAlternatives)
       end
     end
   end
