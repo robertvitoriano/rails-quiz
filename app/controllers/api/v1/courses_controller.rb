@@ -74,15 +74,27 @@ module Api
 				questions = CourseQuestion.select("id, question_text, course_id as courseId").where("course_id = ?", course_battle.course_id)
 				questions_result = []
 				question_ids = questions.map { |question| question.id }
-				course_alternatives = QuestionAlternative.select("alternative_text as text, course_question_id as questionId, is_right as isRight, id").where(course_question_id: question_ids)
+				course_alternatives = QuestionAlternative.select("alternative_text as text,
+					 course_question_id as questionId, 
+					 is_right as isRight,
+					 id").where(course_question_id: question_ids)
+				user_alternatives = UserAlternative.select(
+					'id, 
+					user_id as userId, 
+					question_alternative as questionAlternative,id, 
+					course_battle_id as courseBattleId, 
+					created_at as createdAt').where()
 				course_type = CourseType.select("id, title").where("id = "+course.courseTypeId.to_s)
 				questions.each_with_index do |question, index|
 					question_alternatives = course_alternatives.select {|alternative| alternative.questionId == question.id}
+					question_alternatives = course_alternatives.select {|alternative| alternative.questionId == question.id}
+
 					questions_result.push({
 						:id => question[:id],
 						:text => question[:question_text],
 						:courseId => params[:id],
 						:alternatives => question_alternatives
+						# :userAlternative => u
 					})
 				end
 
