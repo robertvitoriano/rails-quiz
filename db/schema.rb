@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_05_27_120737) do
+ActiveRecord::Schema[7.1].define(version: 2024_05_28_235814) do
   create_table "active_storage_attachments", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -39,36 +39,34 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_27_120737) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
-  create_table "batles", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
-    t.string "title"
-    t.integer "duration"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
   create_table "course_battle_messages", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
-    t.integer "user_id"
+    t.bigint "user_id"
     t.string "message"
     t.binary "course_battle_id", limit: 36
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["course_battle_id"], name: "fk_rails_f31e0e68da"
+    t.index ["user_id"], name: "fk_rails_b3c74d0e53"
   end
 
   create_table "course_battle_users", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
-    t.integer "user_id", null: false
+    t.bigint "user_id", null: false
     t.string "result"
     t.decimal "performance", precision: 10
     t.integer "time_spent"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.binary "course_battle_id", limit: 36, null: false
+    t.index ["course_battle_id"], name: "fk_rails_319dec625f"
+    t.index ["user_id"], name: "fk_rails_ab2a5d20a2"
   end
 
   create_table "course_battles", id: { type: :binary, limit: 36 }, charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
-    t.integer "course_id"
+    t.bigint "course_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "name"
+    t.index ["course_id"], name: "fk_rails_5784485752"
   end
 
   create_table "course_questions", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
@@ -111,6 +109,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_27_120737) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["notification_type_id"], name: "fk_rails_75cdc2096d"
+    t.index ["notified_id"], name: "fk_rails_80bc2fa31e"
+    t.index ["notifier_id"], name: "fk_rails_7f05a659ce"
   end
 
   create_table "question_alternatives", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
@@ -142,12 +142,13 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_27_120737) do
   end
 
   create_table "user_friends", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
-    t.integer "user_id1"
-    t.integer "user_id2"
+    t.bigint "user_id1"
+    t.bigint "user_id2"
     t.column "status", "enum('accepted','rejected','pending')", default: "pending", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id1", "user_id2"], name: "index_user_friends_on_user_id1_and_user_id2", unique: true
+    t.index ["user_id2"], name: "fk_rails_b2454fd8ba"
   end
 
   create_table "users", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
@@ -163,14 +164,23 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_27_120737) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "course_battle_messages", "course_battles"
+  add_foreign_key "course_battle_messages", "users"
+  add_foreign_key "course_battle_users", "course_battles"
+  add_foreign_key "course_battle_users", "users"
+  add_foreign_key "course_battles", "courses"
   add_foreign_key "course_questions", "courses"
   add_foreign_key "course_questions", "courses", on_delete: :cascade
   add_foreign_key "courses", "course_types"
   add_foreign_key "courses", "users"
   add_foreign_key "notifications", "notification_types"
+  add_foreign_key "notifications", "users", column: "notified_id"
+  add_foreign_key "notifications", "users", column: "notifier_id"
   add_foreign_key "question_alternatives", "course_questions"
   add_foreign_key "question_alternatives", "course_questions", on_delete: :cascade
   add_foreign_key "user_alternatives", "course_questions", column: "question_id"
   add_foreign_key "user_alternatives", "question_alternatives"
   add_foreign_key "user_alternatives", "users"
+  add_foreign_key "user_friends", "users", column: "user_id1"
+  add_foreign_key "user_friends", "users", column: "user_id2"
 end
