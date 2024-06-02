@@ -5,7 +5,7 @@ Rails.application.routes.draw do
       resources :courses do
         collection do
           get 'get-battle-courses', to:'courses#get_battle_courses'
-          get '/:courseBattleId', to: 'courses#show'
+          get 'course-battles/:courseBattleId', to: 'courses#get_course_battle'
         end
       end
       resources :notifications do

@@ -4,7 +4,7 @@ module Api
 	module V1
 		class CoursesController < ApplicationController
 			before_action :authenticate_admin_request, only: [:create, :update, :destroy, :index ]
-			before_action :authenticate_user_request, only: [:get_battle_courses, :show, ]
+			before_action :authenticate_user_request, only: [:get_battle_courses, :show, :get_course_battle ]
 
 			def index
 				limit = params['limit'] != nil ? params['limit'].to_i : 400
@@ -68,7 +68,7 @@ module Api
 				}, status: :ok
 			end
 
-			def show
+			def get_course_battle
 				course_battle = CourseBattle.select('course_id').where("id = ?", params[:courseBattleId]).first()
 				course = Course.select("id, title, goal, cover, course_type_id as courseTypeId").where("id = ?", course_battle.course_id).first()
 				questions = CourseQuestion.select("id, question_text, course_id as courseId").where("course_id = ?", course_battle.course_id)
@@ -84,7 +84,7 @@ module Api
 					question_id as questionId,
 					question_alternative_id as questionAlternativeId,id, 
 					course_battle_id as courseBattleId, 
-					created_at as createdAt').where(question_id: question_ids)
+					created_at as createdAt').where(question_id: question_ids, user_id:current_user[:id])
 				course_type = CourseType.select("id, title").where("id = "+course.courseTypeId.to_s)
 				questions.each_with_index do |question, index|
 					question_alternatives = course_alternatives.select {|alternative| alternative.questionId == question.id}
@@ -111,6 +111,40 @@ module Api
 				},
 					status: :ok
 				end
+				
+				def show
+					course = Course.select("id, title, goal, cover, course_type_id as courseTypeId").where("id = ?", params[:id]).first()
+					questions = CourseQuestion.select("id, question_text, course_id as courseId").where("course_id = ?", params[:id])
+					questions_result = []
+					question_ids = questions.map { |question| question.id }
+					course_alternatives = QuestionAlternative.select("alternative_text as text,
+						 course_question_id as questionId, 
+						 is_right as isRight,
+						 id").where(course_question_id: question_ids)
+
+					course_type = CourseType.select("id, title").where("id = "+course.courseTypeId.to_s)
+					questions.each_with_index do |question, index|
+						question_alternatives = course_alternatives.select {|alternative| alternative.questionId == question.id}
+	
+						questions_result.push({
+							:id => question[:id],
+							:text => question[:question_text],
+							:courseId => params[:courseBattleId],
+							:alternatives => question_alternatives,
+						})
+					end
+	
+					render json: {
+						status:200,
+						message:'found the course',
+						data:{
+							:course => course,
+							:questions => questions_result,
+							:courseType => course_type
+						}
+					},
+						status: :ok
+					end
 
 				def destroy
 					course_to_be_deleted =Course.find(params[:id])
