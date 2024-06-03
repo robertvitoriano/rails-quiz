@@ -1,8 +1,34 @@
 module Api
   module V1
    class CourseBattlesController < ApplicationController
-      before_action :authenticate_user_request, only: [:create]
-      before_action :authenticate_user_request, only: [:index]
+      before_action :authenticate_user_request, only: [:create, :index, :get_course_battle_users, :register_user, :send_message, :get_messages, :finish_course_battle]
+      
+      def index
+        begin
+          course_battles = CourseBattle.joins(:course_battle_users)
+                                       .joins("INNER JOIN courses ON courses.id = course_battles.course_id")
+                                       .select('course_battles.id, 
+                                                course_battles.course_id as courseId, 
+                                                course_battles.name, 
+                                                course_battles.created_at as createdAt, 
+                                                course_battles.updated_at as updatedAt,
+                                                courses.cover')
+                                       .where(course_battle_users: { user_id: current_user.id })
+                                       .order('course_battles.created_at DESC')
+      
+          render json: {
+            status: 200,
+            message: 'Course battles found!',
+            data: { courseBattles: course_battles }
+          }, status: :ok
+        rescue ActiveRecord::RecordInvalid => ex
+          render json: {
+            status: 'Not saved',
+            message: ex.message
+          }, status: :bad_request
+        end
+      end
+
       def create
         begin
           course_battle_created = CourseBattle.create({

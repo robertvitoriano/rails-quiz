@@ -1,6 +1,6 @@
 class CourseBattle < ApplicationRecord
-  has_many :course_batle_users
-
+  has_many :course_battle_users
+  belongs_to :course
   before_create :set_uuid
   private
 
