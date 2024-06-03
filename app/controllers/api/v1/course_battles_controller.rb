@@ -1,7 +1,16 @@
 module Api
   module V1
    class CourseBattlesController < ApplicationController
-      before_action :authenticate_user_request, only: [:create, :index, :get_course_battle_users, :register_user, :send_message, :get_messages, :finish_course_battle]
+      before_action :authenticate_user_request, only: [
+          :create, 
+          :index,
+          :get_course_battle_users,
+          :register_user, 
+          :send_message, 
+          :get_messages, 
+          :finish_course_battle,
+          :show
+        ]
       
       def index
         begin
@@ -28,7 +37,51 @@ module Api
           }, status: :bad_request
         end
       end
+      
+			def show
+				course_battle = CourseBattle.select('course_id').where("id = ?", params[:id]).first()
+				course = Course.select("id, title, goal, cover, course_type_id as courseTypeId").where("id = ?", course_battle.course_id).first()
+				questions = CourseQuestion.select("id, question_text, course_id as courseId").where("course_id = ?", course_battle.course_id)
+				questions_result = []
+				question_ids = questions.map { |question| question.id }
+				course_alternatives = QuestionAlternative.select("alternative_text as text,
+					 course_question_id as questionId, 
+					 is_right as isRight,
+					 id").where(course_question_id: question_ids)
+				user_alternatives = UserAlternative.select(
+					'id, 
+					user_id as userId, 
+					question_id as questionId,
+					question_alternative_id as questionAlternativeId,id, 
+					course_battle_id as courseBattleId, 
+					created_at as createdAt').where(question_id: question_ids, user_id:current_user[:id])
+				course_type = CourseType.select("id, title").where("id = "+course.courseTypeId.to_s)
+				questions.each_with_index do |question, index|
+					question_alternatives = course_alternatives.select {|alternative| alternative.questionId == question.id}
+					question_chosen_alternative_result = user_alternatives.select {|alternative| alternative.questionId == question.id}
+					question_chosen_alternative = question_chosen_alternative_result[0]
 
+					questions_result.push({
+						:id => question[:id],
+						:text => question[:question_text],
+						:courseId => params[:courseBattleId],
+						:alternatives => question_alternatives,
+						:userAlternative => question_chosen_alternative
+					})
+				end
+
+				render json: {
+					status:200,
+					message:'found the course',
+					data:{
+						:course => course,
+						:questions => questions_result,
+						:courseType => course_type
+					}
+				},
+					status: :ok
+			end
+      
       def create
         begin
           course_battle_created = CourseBattle.create({

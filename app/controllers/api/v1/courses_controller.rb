@@ -110,7 +110,7 @@ module Api
 					}
 				},
 					status: :ok
-				end
+			end
 				
 				def show
 					course = Course.select("id, title, goal, cover, course_type_id as courseTypeId").where("id = ?", params[:id]).first()
