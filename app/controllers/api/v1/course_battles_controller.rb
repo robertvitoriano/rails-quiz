@@ -48,17 +48,13 @@ module Api
 					 course_question_id as questionId, 
 					 is_right as isRight,
 					 id").where(course_question_id: question_ids)
-				user_alternatives = UserAlternative.select(
-					'id, 
-					user_id as userId, 
-					question_id as questionId,
-					question_alternative_id as questionAlternativeId,id, 
-					course_battle_id as courseBattleId, 
-					created_at as createdAt').where(question_id: question_ids, user_id:current_user[:id], course_battle_id:params[:id])
+           
+        course_battle_alternatives = get_course_battle_alternatives(question_ids, current_user[:id], params[:id])
+        
 				course_type = CourseType.select("id, title").where("id = "+course.courseTypeId.to_s)
 				questions.each_with_index do |question, index|
 					question_alternatives = course_alternatives.select {|alternative| alternative.questionId == question.id}
-					question_chosen_alternative_result = user_alternatives.select {|alternative| alternative.questionId == question.id}
+					question_chosen_alternative_result = course_battle_alternatives.select {|alternative| alternative.questionId == question.id}
 					question_chosen_alternative = question_chosen_alternative_result[0]
 
 					questions_result.push({
@@ -243,6 +239,18 @@ module Api
             message: ex.to_s
           }, status: :bad_request
         end
+      end
+      
+      def get_course_battle_alternatives(question_ids, user_id, course_battle_id)
+        user_alternatives = UserAlternative.select(
+					'id, 
+					user_id as userId, 
+					question_id as questionId,
+					question_alternative_id as questionAlternativeId,id, 
+					course_battle_id as courseBattleId, 
+					created_at as createdAt').where(question_id: question_ids, user_id:user_id, course_battle_id:course_battle_id)
+          
+          return user_alternatives
       end
         
       def course_battle_creation_params
