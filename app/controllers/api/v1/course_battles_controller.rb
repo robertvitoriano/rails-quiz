@@ -54,7 +54,7 @@ module Api
 					question_id as questionId,
 					question_alternative_id as questionAlternativeId,id, 
 					course_battle_id as courseBattleId, 
-					created_at as createdAt').where(question_id: question_ids, user_id:current_user[:id])
+					created_at as createdAt').where(question_id: question_ids, user_id:current_user[:id], course_battle_id:params[:id])
 				course_type = CourseType.select("id, title").where("id = "+course.courseTypeId.to_s)
 				questions.each_with_index do |question, index|
 					question_alternatives = course_alternatives.select {|alternative| alternative.questionId == question.id}
