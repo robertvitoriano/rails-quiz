@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_06_03_144117) do
+ActiveRecord::Schema[7.1].define(version: 2024_06_04_144150) do
   create_table "active_storage_attachments", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -137,7 +137,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_03_144117) do
     t.bigint "question_id", null: false
     t.index ["question_alternative_id"], name: "index_user_alternatives_on_question_alternative_id"
     t.index ["question_id"], name: "fk_rails_878e243cba"
-    t.index ["user_id", "question_alternative_id", "course_battle_id"], name: "unique_user_alternattive_index_by_batle", unique: true
+    t.index ["user_id", "question_alternative_id", "course_battle_id"], name: "unique_user_alternattive_index_by_battle", unique: true
     t.index ["user_id"], name: "index_user_alternatives_on_user_id"
   end
 
@@ -169,3 +169,18 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_03_144117) do
   add_foreign_key "course_battle_users", "course_battles"
   add_foreign_key "course_battle_users", "users"
   add_foreign_key "course_battles", "courses"
+  add_foreign_key "course_questions", "courses"
+  add_foreign_key "course_questions", "courses", on_delete: :cascade
+  add_foreign_key "courses", "course_types"
+  add_foreign_key "courses", "users"
+  add_foreign_key "notifications", "notification_types"
+  add_foreign_key "notifications", "users", column: "notified_id"
+  add_foreign_key "notifications", "users", column: "notifier_id"
+  add_foreign_key "question_alternatives", "course_questions"
+  add_foreign_key "question_alternatives", "course_questions", on_delete: :cascade
+  add_foreign_key "user_alternatives", "course_questions", column: "question_id"
+  add_foreign_key "user_alternatives", "question_alternatives"
+  add_foreign_key "user_alternatives", "users"
+  add_foreign_key "user_friends", "users", column: "user_id1"
+  add_foreign_key "user_friends", "users", column: "user_id2"
+end
