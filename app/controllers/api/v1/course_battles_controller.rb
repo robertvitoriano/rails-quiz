@@ -218,26 +218,46 @@ module Api
             }, status: :bad_request
             return
           end
-          if opponent_register.result != 'not-finished'
-            #TODO IMPLEMENT CASE WHEN OPPONENT HAS ALREADY FINISHED COURSE
-            render json: {
-              status: 200,
-              message: "OPPONENT FINISHED COURSE IMPLEMENT THIS"
-            }, status: :ok
-            return
+          if  opponent_register != nil && opponent_register.result == 'awating-opponent'
+              user_performance = calculate_user_performance()
+              opponent_performance = opponent_register[:performance]
+              if user_performance > opponent_performance
+                CourseBattleUser.find_by(user_id: current_user[:id],course_battle_id:params[:courseBattleId])
+                .update(result: 'won', performance: user_performance, time_spent: params['timeSpent']) 
+                CourseBattleUser.find_by(user_id: opponent_register[:user_id],course_battle_id:params[:courseBattleId])
+                .update(result: 'lost') 
+                render json: {
+                  status: 200,
+                  message: "User won this quiz battle",
+                  data: {
+                    userPerformance: user_performance,
+                    opponent_performance: opponent_performance,
+                    result:'won'
+                    
+                  }
+                }, status: :ok
+                
+                return
+                
+              elsif opponent_performance > user_performance 
+                CourseBattleUser.find_by(user_id: current_user[:id],course_battle_id:params[:courseBattleId])
+                .update(result: 'lost', performance: user_performance, time_spent: params['timeSpent']) 
+                CourseBattleUser.find_by(user_id: opponent_register[:user_id],course_battle_id:params[:courseBattleId])
+                .update(result: 'won') 
+                render json: {
+                  status: 200,
+                  message: "User lost this course battle",
+                  data: {
+                    userPerformance: user_performance,
+                    opponent_performance: opponent_performance,
+                    result:'lost'
+                  }
+                }, status: :ok
+                return
+              end
           end
           
-          questions_count = CourseQuestion.where(course_id: params['courseId']).count
-
-          chosen_alternative_ids = params['userChosenAlternatives'].map { |hash| hash["id"] }
-
-          right_alternatives_count = QuestionAlternative.where(id: chosen_alternative_ids, is_right: true).count
-
-          if questions_count > 0
-            user_performance = (right_alternatives_count * 100.0) / questions_count
-          else
-            user_performance = 0
-          end
+          user_performance = calculate_user_performance()
 
           CourseBattleUser.find_by(user_id: current_user[:id],course_battle_id:params[:courseBattleId])
           .update(result: 'awaiting-opponent', performance: user_performance, time_spent: params['timeSpent']) 
@@ -275,6 +295,22 @@ module Api
 					created_at as createdAt').where(question_id: question_ids, user_id:user_id, course_battle_id:course_battle_id)
           
           return user_alternatives
+      end
+      
+      def calculate_user_performance
+        questions_count = CourseQuestion.where(course_id: params['courseId']).count
+
+        chosen_alternative_ids = params['userChosenAlternatives'].map { |hash| hash["id"] }
+
+        right_alternatives_count = QuestionAlternative.where(id: chosen_alternative_ids, is_right: true).count
+
+        if questions_count > 0
+          user_performance = (right_alternatives_count * 100.0) / questions_count
+        else
+          user_performance = 0
+        end
+        
+        return user_performance
       end
         
       def course_battle_creation_params
