@@ -239,7 +239,8 @@ module Api
             user_performance = 0
           end
 
-          CourseBattleUser.find_by(user_id: current_user[:id],course_battle_id:params[:courseBattleId]).update(result: 'awaiting-opponent', performance: user_performance) 
+          CourseBattleUser.find_by(user_id: current_user[:id],course_battle_id:params[:courseBattleId])
+          .update(result: 'awaiting-opponent', performance: user_performance, time_spent: params['timeSpent']) 
 
           ActionCable.server.broadcast(
             "course_battle_chat_#{params[:courseBattleId]}",
