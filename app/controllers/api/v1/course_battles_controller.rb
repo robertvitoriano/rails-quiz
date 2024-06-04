@@ -220,7 +220,6 @@ module Api
           end
           if opponent_register.result != 'not-finished'
             #TODO IMPLEMENT CASE WHEN OPPONENT HAS ALREADY FINISHED COURSE
-            logger.warn "OPPONENT FINISHED COURSE IMPLEMENT THIS"
             render json: {
               status: 200,
               message: "OPPONENT FINISHED COURSE IMPLEMENT THIS"
@@ -228,14 +227,20 @@ module Api
             return
           end
           
-          # GET THE PERCENT OF HOW  MANY QUESTION USER HAS GOT RIGHT
-          
-          current_user_register.update(
-            result: 'awaiting-opponent'
-           # performance: new_performance_value, 
-            #time_spent: new_time_spent_value
-          )
-          
+          questions_count = CourseQuestion.where(course_id: params['courseId']).count
+
+          chosen_alternative_ids = params['userChosenAlternatives'].map { |hash| hash["id"] }
+
+          right_alternatives_count = QuestionAlternative.where(id: chosen_alternative_ids, is_right: true).count
+
+          if questions_count > 0
+            user_performance = (right_alternatives_count * 100.0) / questions_count
+          else
+            user_performance = 0
+          end
+
+          CourseBattleUser.find_by(user_id: current_user[:id],course_battle_id:params[:courseBattleId]).update(result: 'awaiting-opponent', performance: user_performance) 
+
           ActionCable.server.broadcast(
             "course_battle_chat_#{params[:courseBattleId]}",
             {
