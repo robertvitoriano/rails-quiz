@@ -210,15 +210,17 @@ module Api
               return
             end
           
-          
-          if current_user_register.result != 'not-finished' && current_user_register.performance != nil 
+            logger.warn("OPPONENT:#{opponent_register.attributes}")
+            logger.warn("USER:#{current_user_register.attributes}")
+
+          if current_user_register[:result] != 'not-finished' && current_user_register.performance != nil 
             render json: {
               status: 400,
               message: 'user already finished quiz battle'
             }, status: :bad_request
             return
           end
-          if  opponent_register != nil && opponent_register.result == 'awating-opponent'
+          if  opponent_register != nil && opponent_register[:result] == 'awaiting-opponent'
               user_performance = calculate_user_performance()
               opponent_performance = opponent_register[:performance]
               if user_performance > opponent_performance
