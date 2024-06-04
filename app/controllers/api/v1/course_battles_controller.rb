@@ -209,9 +209,6 @@ module Api
               }, status: :bad_request
               return
             end
-          
-            logger.warn("OPPONENT:#{opponent_register.attributes}")
-            logger.warn("USER:#{current_user_register.attributes}")
 
           if current_user_register[:result] != 'not-finished' && current_user_register.performance != nil 
             render json: {
