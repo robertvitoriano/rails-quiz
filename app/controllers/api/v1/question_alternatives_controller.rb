@@ -11,7 +11,6 @@ module Api
           course_battle_id: params['courseBattleId']
         })
       
-        
         @user_answer.save!
         
           render json: {status:'SUCCESS', message:'saved user answer', data: @user_answer}, status: :ok
