@@ -4,17 +4,18 @@ module Api
       before_action :authenticate_user_request, only: [:save_user_answer]
 
       def save_user_answer
-        begin
-          user_answer = UserAlternative.create({
-            :user_id => current_user[:id],
-            :question_id => save_user_answer_params['questionId'],
-            :question_alternative_id => save_user_answer_params['questionAlternativeId'],
-            :course_battle_id => params['courseBattleId']
-          })
-          user_answer.save!
-          render json: {status:'SUCCESS', message:'saved user answer', data: user_answer}, status: :ok
+        @user_answer = UserAlternative.new({
+          user_id: current_user[:id],
+          question_id: params['questionId'],
+          question_alternative_id: params['questionAlternativeId'],
+          course_battle_id: params['courseBattleId']
+        })
+      
+        @user_answer.save!
+        
+          render json: {status:'SUCCESS', message:'saved user answer', data: @user_answer}, status: :ok
         rescue  Exception => ex
-          render json: {status:'Not saved', message:ex}, status: :ok
+          render json: {status:'Not saved', message:ex}, status: :bad_request
         end
       end
 
@@ -27,4 +28,4 @@ module Api
 
     end
   end
-end
+

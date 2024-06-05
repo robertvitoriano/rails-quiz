@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_05_28_235814) do
+ActiveRecord::Schema[7.1].define(version: 2024_06_04_144150) do
   create_table "active_storage_attachments", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -51,7 +51,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_28_235814) do
 
   create_table "course_battle_users", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.bigint "user_id", null: false
-    t.string "result"
+    t.column "result", "enum('won','lost','awaiting-opponent','not-finished')", default: "not-finished", null: false
     t.decimal "performance", precision: 10
     t.integer "time_spent"
     t.datetime "created_at", null: false
@@ -137,7 +137,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_28_235814) do
     t.bigint "question_id", null: false
     t.index ["question_alternative_id"], name: "index_user_alternatives_on_question_alternative_id"
     t.index ["question_id"], name: "fk_rails_878e243cba"
-    t.index ["user_id", "question_alternative_id", "course_battle_id"], name: "unique_user_alternattive_index_by_batle", unique: true
+    t.index ["user_id", "question_alternative_id", "course_battle_id"], name: "unique_user_alternattive_index_by_battle", unique: true
     t.index ["user_id"], name: "index_user_alternatives_on_user_id"
   end
 
@@ -164,7 +164,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_28_235814) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
-  add_foreign_key "course_battle_messages", "course_battles"
+  add_foreign_key "course_battle_messages", "course_battles", on_delete: :cascade
   add_foreign_key "course_battle_messages", "users"
   add_foreign_key "course_battle_users", "course_battles"
   add_foreign_key "course_battle_users", "users"

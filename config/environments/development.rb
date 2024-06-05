@@ -73,13 +73,12 @@ Rails.application.configure do
     # Include generic and useful information about system operation, but avoid logging too much
   # information to avoid inadvertent exposure of personally identifiable information (PII).
    # Use the default Rails logger
-   config.log_level = :info  # Set the log level to :debug, :info, :warn, :error, or :fatal
 
    # Prepend all log lines with the following tags
    config.log_tags = [:request_id]
 
    # Use the lowest log level to ensure availability of diagnostic information when problems arise.
-   config.log_level = :debug 
+   config.log_level = :warn
  
    # Production log format is concise
    config.log_formatter = ::Logger::Formatter.new
