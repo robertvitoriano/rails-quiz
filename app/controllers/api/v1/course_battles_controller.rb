@@ -9,7 +9,8 @@ module Api
           :send_message, 
           :get_messages, 
           :finish_course_battle,
-          :show
+          :show,
+          :get_course_battle_result
         ]
       
       def index
@@ -274,7 +275,11 @@ module Api
       
           render json: {
             status: 200,
-            message: 'quiz battle finished'
+            message: 'Successfully finished, waiting for opponent to finish!',
+            data: {
+              userPerformance: user_performance,
+              result:'awaiting-opponent'
+            }
           }, status: :ok
         rescue StandardError => ex
           render json: {
@@ -282,6 +287,41 @@ module Api
             message: ex.to_s
           }, status: :bad_request
         end
+      end
+      
+      def get_course_battle_result
+        begin
+
+          registered_users = CourseBattleUser.select(
+            "result, performance, time_spent, user_id"
+          ).where(course_battle_id: params[:courseBattleId].to_s)
+          
+          current_user_register = registered_users.find_by(user_id: current_user[:id])
+          opponent_register = registered_users.where.not(user_id: current_user[:id]).first
+          
+            if current_user_register == nil
+              render json: {
+                status: 400,
+                message: 'user not registered in quiz'
+              }, status: :bad_request
+              return
+            end
+
+          render json: {
+            status: 200,
+            message: 'result fetched!',
+            data: {
+              userPerformance: current_user_register[:performance],
+              opponentPerformance: opponent_register[:performance],
+              result:current_user_register[:result]
+            }
+          }, status: :ok
+        rescue StandardError => ex
+          render json: {
+            status: 'error to get quiz result',
+            message: ex.to_s
+          }, status: :bad_request
+        end        
       end
       
       def get_course_battle_alternatives(question_ids, user_id, course_battle_id)
