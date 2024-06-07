@@ -174,7 +174,13 @@ module Api
                 user_id2:add_friend_params['userId2']
               })
               user_friend.save!
-              Api::V1::NotificationService.create_notification(current_user[:id], add_friend_params['userId2'], 1)
+              
+              Notification.create({
+                notification_type_id: 1,
+                is_read: false,
+                notifier_id:current_user[:id],
+                notified_id:add_friend_params['userId2']
+              })
               ActionCable.server.broadcast("user_notification_#{add_friend_params['userId2']}", 
                 {
                   userId:current_user[:id],
@@ -190,9 +196,9 @@ module Api
       end
 
       def set_friendship_result
-        query = UserFriend.where(user_id1: friendship_result_params['userId1'], user_id2: current_user[:id])
-        puts query.to_sql
-        query.update(status: friendship_result_params['result'])
+        friend = UserFriend.where(user_id1: friendship_result_params['userId1'], user_id2: current_user[:id])
+        logger.warn friend.to_sql
+        friend.update(status: friendship_result_params['result'])
       end
 
       def unfriend
