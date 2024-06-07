@@ -254,6 +254,22 @@ module Api
                   }
                 }, status: :ok
                 return
+                
+              elsif opponent_performance == user_performance 
+                CourseBattleUser.find_by(user_id: current_user[:id],course_battle_id:params[:courseBattleId])
+                .update(result: 'draw', performance: user_performance, time_spent: params['timeSpent']) 
+                CourseBattleUser.find_by(user_id: opponent_register[:user_id],course_battle_id:params[:courseBattleId])
+                .update(result: 'draw') 
+                render json: {
+                  status: 200,
+                  message: "There was a draw in this battle",
+                  data: {
+                    userPerformance: user_performance,
+                    opponent_performance: opponent_performance,
+                    result:'draw'
+                  }
+                }, status: :ok
+                return
               end
           end
           
