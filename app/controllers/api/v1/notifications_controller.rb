@@ -5,11 +5,15 @@ module Api
 
       def index
         begin
-          notifications = Notification.select("id, 
-                                             notifier_id, 
-                                             notified_id, 
-                                             notification_type_id, 
-                                             is_read")
+          notifications = Notification.joins(:notification_type)
+                                      .joins("INNER JOIN users ON users.id = notifications.notifier_id")
+                                      .select("
+                                             notifications.id,
+                                             notification_types.name as type, 
+                                             notifier_id as notifierId, 
+                                             users.name as notifierName,
+                                             notified_id as notifiedId, 
+                                             is_read as isRead")
                                              .where("notified_id = :user_id", user_id: current_user[:id].to_i)
                                              
           render json: {status:'SUCCESS', message:'notifications found!', data: notifications}, status: :ok
