@@ -152,7 +152,7 @@ module Api
         begin
           friends = UserFriend.select("*")
           .joins("JOIN users ON users.id = user_friends.user_id1 OR users.id = user_friends.user_id2")
-          .where("(user_friends.user_id1 = ? OR user_friends.user_id2 = ?) AND user_friends.status = ?", current_user[:id], current_user[:id], "accepted")
+          .where("(user_friends.user_id1 = ? OR user_friends.user_id2 = ?) AND users.id <> ? AND user_friends.status = ?", current_user[:id], current_user[:id],current_user[:id], "accepted")
 
           render json: {status:'SUCCESS', data: friends}, status: :ok
 

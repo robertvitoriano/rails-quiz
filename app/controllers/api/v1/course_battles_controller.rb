@@ -193,117 +193,6 @@ module Api
         }, status: :bad_request
         end
       end
-      def finish_course_battle
-        begin
-
-          registered_users = CourseBattleUser.select(
-            "result, performance, time_spent, user_id"
-          ).where(course_battle_id: params[:courseBattleId].to_s)
-          
-          current_user_register = registered_users.find_by(user_id: current_user[:id])
-          opponent_register = registered_users.where.not(user_id: current_user[:id]).first
-          
-            if current_user_register == nil
-              render json: {
-                status: 400,
-                message: 'user not registered in quiz'
-              }, status: :bad_request
-              return
-            end
-
-          if current_user_register[:result] != 'not-finished' && current_user_register.performance != nil 
-            render json: {
-              status: 400,
-              message: 'user already finished quiz battle'
-            }, status: :bad_request
-            return
-          end
-          if  opponent_register != nil && opponent_register[:result] == 'awaiting-opponent'
-              user_performance = calculate_user_performance()
-              opponent_performance = opponent_register[:performance]
-              if user_performance > opponent_performance
-                CourseBattleUser.find_by(user_id: current_user[:id],course_battle_id:params[:courseBattleId])
-                .update(result: 'won', performance: user_performance, time_spent: params['timeSpent']) 
-                CourseBattleUser.find_by(user_id: opponent_register[:user_id],course_battle_id:params[:courseBattleId])
-                .update(result: 'lost') 
-                render json: {
-                  status: 200,
-                  message: "User won this quiz battle",
-                  data: {
-                    userPerformance: user_performance,
-                    opponent_performance: opponent_performance,
-                    result:'won'
-                    
-                  }
-                }, status: :ok
-                
-                return
-                
-              elsif opponent_performance > user_performance 
-                CourseBattleUser.find_by(user_id: current_user[:id],course_battle_id:params[:courseBattleId])
-                .update(result: 'lost', performance: user_performance, time_spent: params['timeSpent']) 
-                CourseBattleUser.find_by(user_id: opponent_register[:user_id],course_battle_id:params[:courseBattleId])
-                .update(result: 'won') 
-                render json: {
-                  status: 200,
-                  message: "User lost this course battle",
-                  data: {
-                    userPerformance: user_performance,
-                    opponent_performance: opponent_performance,
-                    result:'lost'
-                  }
-                }, status: :ok
-                return
-                
-              elsif opponent_performance == user_performance 
-                CourseBattleUser.find_by(user_id: current_user[:id],course_battle_id:params[:courseBattleId])
-                .update(result: 'draw', performance: user_performance, time_spent: params['timeSpent']) 
-                CourseBattleUser.find_by(user_id: opponent_register[:user_id],course_battle_id:params[:courseBattleId])
-                .update(result: 'draw') 
-                render json: {
-                  status: 200,
-                  message: "There was a draw in this battle",
-                  data: {
-                    userPerformance: user_performance,
-                    opponent_performance: opponent_performance,
-                    result:'draw'
-                  }
-                }, status: :ok
-                return
-              end
-          end
-          
-          user_performance = calculate_user_performance()
-
-          CourseBattleUser.find_by(user_id: current_user[:id],course_battle_id:params[:courseBattleId])
-          .update(result: 'awaiting-opponent', performance: user_performance, time_spent: params['timeSpent']) 
-
-          ActionCable.server.broadcast(
-            "course_battle_chat_#{params[:courseBattleId]}",
-            {
-              userId: current_user.id,
-              name: current_user.name,
-              avatar: current_user.avatar,
-              courseBattleId: params[:courseBattleId],
-              type: "opponent_finished_quiz_battle"
-            }
-          )
-      
-          render json: {
-            status: 200,
-            message: 'Successfully finished, waiting for opponent to finish!',
-            data: {
-              userPerformance: user_performance,
-              result:'awaiting-opponent'
-            }
-          }, status: :ok
-        rescue StandardError => ex
-          render json: {
-            status: 'error finishing quiz battle',
-            message: ex.to_s
-          }, status: :bad_request
-        end
-      end
       
       def get_course_battle_result
         begin
@@ -339,6 +228,102 @@ module Api
           }, status: :bad_request
         end        
       end
+      
+      def finish_course_battle
+        begin
+          registered_users = CourseBattleUser
+                               .select(:result, :performance, :time_spent, :user_id)
+                               .where(course_battle_id: params[:courseBattleId].to_s)
+      
+          current_user_register = registered_users.find_by(user_id: current_user[:id])
+          opponent_register = registered_users.where.not(user_id: current_user[:id]).first
+      
+          unless current_user_register
+            render json: { status: 400, message: 'User not registered in quiz' }, status: :bad_request
+            return
+          end
+      
+          if current_user_register.result != 'not-finished' && current_user_register.performance.present?
+            render json: { status: 400, message: 'User already finished quiz battle' }, status: :bad_request
+            return
+          end
+      
+          if opponent_register && opponent_register.result == 'awaiting-opponent'
+            user_performance = calculate_user_performance
+            opponent_performance = opponent_register.performance
+      
+            result, opponent_result = determine_results(user_performance, opponent_performance)
+      
+            update_course_battle_user(current_user[:id], params[:courseBattleId], result, user_performance, params[:timeSpent])
+            update_course_battle_user(opponent_register.user_id, params[:courseBattleId], opponent_result)
+      
+            render json: build_response(result, user_performance, opponent_performance), status: :ok
+            return
+          end
+      
+          user_performance = calculate_user_performance
+          update_course_battle_user(current_user[:id], params[:courseBattleId], 'awaiting-opponent', user_performance, params[:timeSpent])
+          broadcast_opponent_finished
+      
+          render json: build_waiting_response(user_performance), status: :ok
+        rescue StandardError => e
+          render json: { status: 'error finishing quiz battle', message: e.to_s }, status: :bad_request
+        end
+      end
+      
+      private
+      
+      def determine_results(user_performance, opponent_performance)
+        if user_performance > opponent_performance
+          ['won', 'lost']
+        elsif opponent_performance > user_performance
+          ['lost', 'won']
+        else
+          ['draw', 'draw']
+        end
+      end
+      
+      def update_course_battle_user(user_id, battle_id, result, performance = nil, time_spent = nil)
+        CourseBattleUser.find_by(user_id: user_id, course_battle_id: battle_id)
+                        .update(result: result, performance: performance, time_spent: time_spent)
+      end
+      
+      def build_response(result, user_performance, opponent_performance)
+        {
+          status: 200,
+          message: "User #{result} this quiz battle",
+          data: {
+            userPerformance: user_performance,
+            opponent_performance: opponent_performance,
+            result: result
+          }
+        }
+      end
+      
+      def build_waiting_response(user_performance)
+        {
+          status: 200,
+          message: 'Successfully finished, waiting for opponent to finish!',
+          data: {
+            userPerformance: user_performance,
+            result: 'awaiting-opponent'
+          }
+        }
+      end
+      
+      def broadcast_opponent_finished
+        ActionCable.server.broadcast(
+          "course_battle_chat_#{params[:courseBattleId]}",
+          {
+            userId: current_user.id,
+            name: current_user.name,
+            avatar: current_user.avatar,
+            courseBattleId: params[:courseBattleId],
+            type: "opponent_finished_quiz_battle"
+          }
+        )
+      end
+      
       
       def get_course_battle_alternatives(question_ids, user_id, course_battle_id)
         user_alternatives = UserAlternative.select(
