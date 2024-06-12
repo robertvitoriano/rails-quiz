@@ -19,7 +19,7 @@ module Api
                                        .joins("INNER JOIN courses ON courses.id = course_battles.course_id")
                                        .select('course_battles.id, 
                                                 course_battles.course_id as courseId, 
-                                                course_battles.name, 
+                                                courses.title as name, 
                                                 course_battles.created_at as createdAt, 
                                                 course_battles.updated_at as updatedAt,
                                                 courses.cover')
@@ -82,7 +82,6 @@ module Api
       def create
         begin
           course_battle_created = CourseBattle.create({
-            name: course_battle_creation_params[:name],
             course_id: course_battle_creation_params[:courseId]
           })
           course_battle_user = CourseBattleUser.create({
