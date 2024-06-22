@@ -132,12 +132,21 @@ module Api
       end
 
       def login
-        command = AuthenticateUser.call(login_user_params[:username], login_user_params[:password])
+        login_response = AuthenticateUser.call(login_user_params[:username], login_user_params[:password])
 
-        if command.success?
-          render json: command.result
+        if login_response.success?
+          render json: login_response.result
         else
-          render json: { error: command.errors }, status: :unauthorized
+          render json: { error: login_response.errors }, status: :unauthorized
+        end
+      end
+      def oauth_login
+        login_response = AuthenticateUser.call(oauth_login_params[:token])
+
+        if login_response.success?
+          render json: login_response.result
+        else
+          render json: { error: login_response.errors }, status: :unauthorized
         end
       end
       def destroy
@@ -215,6 +224,9 @@ module Api
       end
       def login_user_params
         params.permit(:username,:password)
+      end
+      def oauth_login_params
+        params.permit(:token)
       end
       def add_friend_params
         params.permit(:userId2)
