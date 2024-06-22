@@ -210,8 +210,6 @@ module Api
               }, status: :bad_request
               return
             end
-            logger.warn("PLAYER RESULT " + current_user_register[:performance].to_s)
-            logger.warn("OPPONENT RESULT: #{opponent_register.inspect}")
 
           render json: {
             status: 200,
@@ -219,6 +217,8 @@ module Api
             data: {
               userPerformance: current_user_register[:performance],
               opponentPerformance: opponent_register[:performance],
+              userTimeSpent:current_user_register[:time_spent],
+              opponentTimeSpent:opponent_register[:time_spent],
               result:current_user_register[:result]
             }
           }, status: :ok
