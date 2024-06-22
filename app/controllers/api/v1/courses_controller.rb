@@ -259,8 +259,8 @@ module Api
 							:course_type_id => course_parsed['courseTypeId'],
 							:user_id => current_user[:id],
 							:cover => encoded_uri
-						}
-					)
+						})
+						
 					course.save!
 					questions = []
 					course_parsed['questions'].each_with_index do |question, index|
@@ -282,7 +282,7 @@ module Api
 								}
 							)
 						)
-					end
+						end
 
 					questions.push({
 						:question_text => course_question[:question_text],
