@@ -49,8 +49,7 @@ class AuthenticateUser
   end
 
   def authenticate_with_oauth
-    google_service = GoogleApiService.new(username_or_token)
-    user_info = google_service.fetch_user_info
+    user_info = fetch_user_info(username_or_token)
     
     if user_info[:error].present?
       errors.add :oauth, user_info[:error]
@@ -61,10 +60,31 @@ class AuthenticateUser
     user.name = user_info['name']
     user.username = user_info['given_name'] || user_info['email'].split('@').first
     user.avatar = user_info['picture']
-    user.save!
+    user.provider = 'google_oauth2'
+    user.save!(validate: false) 
     
     generate_auth_response(user)
   end
+  
+  private
+  
+  def fetch_user_info(access_token)
+    uri = URI("https://www.googleapis.com/oauth2/v1/userinfo?alt=json")
+    request = Net::HTTP::Get.new(uri)
+    request["Authorization"] = "Bearer #{access_token}"
+  
+    response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) do |http|
+      http.request(request)
+    end
+  
+    case response
+    when Net::HTTPSuccess
+      JSON.parse(response.body)
+    else
+      { error: response.message }
+    end
+  end
+  
 
   def generate_auth_response(user)
     token = JsonWebToken.encode(user_id: user.id, level: user.level)
