@@ -142,9 +142,9 @@ module Api
       end
       def oauth_login
         login_response = AuthenticateUser.call(oauth_login_params[:token])
-
+      
         if login_response.success?
-          render json: login_response.result
+          render json: login_response.result, status: :ok
         else
           render json: { error: login_response.errors }, status: :unauthorized
         end
