@@ -3,8 +3,8 @@ require 'uri'
 module Api
 	module V1
 		class CoursesController < ApplicationController
-			before_action :authenticate_admin_request, only: [:create, :update, :destroy, :index ]
-			before_action :authenticate_user_request, only: [:get_battle_courses, :show, :get_course_battle ]
+			before_action :authenticate_admin_request, only: [:update, :destroy, :index ]
+			before_action :authenticate_user_request, only: [:create, :get_battle_courses, :show, :get_course_battle ]
 
 			def index
 				limit = params['limit'] != nil ? params['limit'].to_i : 400
