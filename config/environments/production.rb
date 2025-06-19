@@ -36,11 +36,11 @@ Rails.application.configure do
   # Mount Action Cable outside main process or domain.
   # config.action_cable.mount_path = nil
   config.action_cable.disable_request_forgery_protection = true
-  config.action_cable.url = "ws://localhost:4000/cable"
+  config.action_cable.url = "ws://localhost:3000/cable"
   config.action_cable.allowed_request_origins = [/http:\/\/*/, /https:\/\/*/]
 
 
-  config.hosts << "main-backend.robertvitoriano.com:4000"
+  config.hosts << "api.robertvitoriano.com:3000"
   # config.action_cable.allowed_request_origins = [ "http://example.com", /http:\/\/example.*/ ]
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
@@ -79,7 +79,7 @@ Rails.application.configure do
   # Use a different logger for distributed setups.
   # require "syslog/logger"
   # config.logger = ActiveSupport::TaggedLogging.new(Syslog::Logger.new "app-name")
-    config.hosts << "main-backend.robertvitoriano.com:4000"
+    config.hosts << "api.robertvitoriano.com:3000"
 
   if ENV["RAILS_LOG_TO_STDOUT"].present?
     logger           = ActiveSupport::Logger.new(STDOUT)
