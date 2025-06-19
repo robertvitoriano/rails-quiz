@@ -1,27 +1,22 @@
 default: &default
   adapter: mysql2
-  database: <%= ENV['MYSQLDB_DATABASE'] %>
+  encoding: utf8
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
   username: <%= ENV['MYSQLDB_USER'] %>
   password: <%= ENV['MYSQLDB_ROOT_PASSWORD'] %>
   host: <%= ENV['MYSQLDB_HOST'] %>
-
-  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-  timeout: 5000
 
 development:
   <<: *default
-  adapter: mysql2
   database: <%= ENV['MYSQLDB_DATABASE'] %>
-  username: <%= ENV['MYSQLDB_USER'] %>
-  password: <%= ENV['MYSQLDB_ROOT_PASSWORD'] %>
-  host: <%= ENV['MYSQLDB_HOST'] %>
+
 test:
   <<: *default
-  adapter: mysql2
   database: <%= ENV['MYSQLDB_TEST_DATABASE'] %>
   username: <%= ENV['MYSQLDB_TEST_USER'] %>
   password: <%= ENV['MYSQLDB_ROOT_TEST_PASSWORD'] %>
-  host: <%= ENV['MYSQLDB__TEST_HOST'] %>
+  host: <%= ENV['MYSQLDB_TEST_HOST'] %>
+
 
 production:
   <<: *default

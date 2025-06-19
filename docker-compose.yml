@@ -1,16 +1,21 @@
 version: '3.8'
 
 services:
-  mysqldb:
-    image: mysql:5.7
-    restart: always
+
+
+  web:
+    build: .
+    command: bundle exec rails server -b 0.0.0.0
+    volumes:
+      - .:/app
+    ports:
+      - "3000:3000"
     env_file: ./.env
     environment:
-      - MYSQL_ROOT_PASSWORD=123
-      - MYSQL_DATABASE=$MYSQLDB_DATABASE
-    ports:
-      - $MYSQLDB_LOCAL_PORT:$MYSQLDB_DOCKER_PORT
-    volumes:
-      - db:/var/lib/mysqldata
+      - DATABASE_HOST=${MYSQLDB_HOST}
+      - DATABASE_USERNAME=${MYSQLDB_USER}
+      - DATABASE_PASSWORD=${MYSQLDB_ROOT_PASSWORD}
+      - DATABASE_NAME=${MYSQLDB_DATABASE}
+
 volumes: 
   db:
