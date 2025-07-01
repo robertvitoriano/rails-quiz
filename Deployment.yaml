@@ -1,0 +1,111 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rails-quiz-deployment
+  labels:
+    app: rails-quiz
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rails-quiz
+  template:
+    metadata:
+      labels:
+        app: rails-quiz
+    spec:
+      containers:
+      - name: rails-quiz-redis
+        image: redis:8
+        ports:
+          - containerPort: 6379
+      - name: rails-quiz
+        image: robertvitoriano/rails-quiz:latest
+        ports:
+          - containerPort: 8000
+        env:
+          - name: MYSQLDB_USER
+            valueFrom:
+              secretKeyRef:
+                name: rails-quiz-secret
+                key: MYSQLDB_USER
+          - name: MYSQLDB_HOST
+            valueFrom:
+              secretKeyRef:
+                name: rails-quiz-secret
+                key: MYSQLDB_HOST
+          - name: MYSQLDB_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: rails-quiz-secret
+                key: MYSQLDB_ROOT_PASSWORD
+          - name: MYSQLDB_DATABASE
+            valueFrom:
+              secretKeyRef:
+                name: rails-quiz-secret
+                key: MYSQLDB_DATABASE
+          - name: MYSQLDB_LOCAL_PORT
+            valueFrom:
+              secretKeyRef:
+                name: rails-quiz-secret
+                key: MYSQLDB_LOCAL_PORT
+          - name: MYSQLDB_DOCKER_PORT
+            valueFrom:
+              secretKeyRef:
+                name: rails-quiz-secret
+                key: MYSQLDB_DOCKER_PORT
+          - name: API_SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                name: rails-quiz-secret
+                key: API_SECRET_KEY
+          - name: AWS_ACCESS_KEY_ID
+            valueFrom:
+              secretKeyRef:
+                name: rails-quiz-secret
+                key: AWS_ACCESS_KEY_ID
+          - name: AWS_SECRET_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: rails-quiz-secret
+                key: AWS_SECRET_ACCESS_KEY
+          - name: S3_BUCKET
+            valueFrom:
+              secretKeyRef:
+                name: rails-quiz-secret
+                key: S3_BUCKET
+          - name: AWS_REGION
+            valueFrom:
+              secretKeyRef:
+                name: rails-quiz-secret
+                key: AWS_REGION
+          - name: RACK_ENV
+            valueFrom:
+              secretKeyRef:
+                name: rails-quiz-secret
+                key: RACK_ENV
+          - name: RAILS_ENV
+            valueFrom:
+              secretKeyRef:
+                name: rails-quiz-secret
+                key: RAILS_ENV
+          - name: RAILS_LOG_TO_STDOUT
+            valueFrom:
+              secretKeyRef:
+                name: rails-quiz-secret
+                key: RAILS_LOG_TO_STDOUT
+          - name: RAILS_SERVE_STATIC_FILES
+            valueFrom:
+              secretKeyRef:
+                name: rails-quiz-secret
+                key: RAILS_SERVE_STATIC_FILES
+          - name: LANG
+            valueFrom:
+              secretKeyRef:
+                name: rails-quiz-secret
+                key: LANG
+          - name: SECRET_KEY_BASE
+            valueFrom:
+              secretKeyRef:
+                name: rails-quiz-secret
+                key: SECRET_KEY_BASE
